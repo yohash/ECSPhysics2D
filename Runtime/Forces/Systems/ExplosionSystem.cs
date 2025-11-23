@@ -2,7 +2,6 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEngine;
 using UnityEngine.LowLevelPhysics2D;
 
 namespace ECSPhysics2D
@@ -42,8 +41,6 @@ namespace ECSPhysics2D
           falloff = 0
         };
 
-        physicsWorld.Explode(definition);
-
         // Note: Box2D's Explode() doesn't support custom falloff or layer filtering
         // If we need those, we'd have to implement custom explosion logic:
 
@@ -51,6 +48,8 @@ namespace ECSPhysics2D
             explosion.ValueRO.AffectedLayers != ~0u) {
           // Custom explosion implementation for non-default settings
           ApplyCustomExplosion(physicsWorld, explosion.ValueRO);
+        } else {
+          physicsWorld.Explode(definition);
         }
 
         // Remove explosion component (one-shot)
@@ -82,7 +81,8 @@ namespace ECSPhysics2D
       for (int i = 0; i < overlaps.Length; i++) {
 
         var body = overlaps[i].shape.body;
-        if (!body.isValid || body.bodyType != RigidbodyType2D.Dynamic)
+
+        if (!body.isValid || body.type != PhysicsBody.BodyType.Dynamic)
           continue;
 
         var bodyPos = body.position;

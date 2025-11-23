@@ -46,7 +46,12 @@ namespace ECSPhysics2D
 
           // Get shape's closest point to query point          
           var closestPoint = shape.ClosestPoint(request.ValueRO.Point);
-          var distSq = math.lengthsq(closestPoint - request.ValueRO.Point);
+          var difference = new float2
+          {
+            x = closestPoint.x - request.ValueRO.Point.x,
+            y = closestPoint.y - request.ValueRO.Point.y
+          };
+          var distSq = math.lengthsq(difference);
 
           if (distSq < closestDistSq) {
             closestDistSq = distSq;
@@ -57,7 +62,7 @@ namespace ECSPhysics2D
               Distance = math.sqrt(distSq),
               Body = body,
               Shape = shape,
-              Entity = GetEntityFromBody(body)
+              Entity = body.GetEntityUserData()
             };
             found = true;
           }
@@ -74,15 +79,6 @@ namespace ECSPhysics2D
 
       ecb.Playback(state.EntityManager);
       ecb.Dispose();
-    }
-
-    private Entity GetEntityFromBody(PhysicsBody body)
-    {
-      if (!body.isValid) {
-        return Entity.Null;
-      }
-      var entityIndex = body.userData.intValue;
-      return new Entity { Index = entityIndex };
     }
   }
 }

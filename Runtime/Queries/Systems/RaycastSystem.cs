@@ -45,7 +45,7 @@ namespace ECSPhysics2D
           Distance = hit ? results[0].fraction * request.ValueRO.MaxDistance : request.ValueRO.MaxDistance,
           Shape = hit ? results[0].shape : default,
           Body = hit ? results[0].shape.body : default,
-          HitEntity = hit ? GetEntityFromBody(results[0].shape.body) : Entity.Null
+          HitEntity = hit ? results[0].shape.body.GetEntityUserData() : Entity.Null
         };
 
         results.Dispose();
@@ -61,15 +61,6 @@ namespace ECSPhysics2D
 
       ecb.Playback(state.EntityManager);
       ecb.Dispose();
-    }
-
-    private Entity GetEntityFromBody(PhysicsBody body)
-    {
-      if (!body.isValid) {
-        return Entity.Null;
-      }
-      var entityIndex = body.userData.intValue;
-      return new Entity { Index = entityIndex };
     }
   }
 }

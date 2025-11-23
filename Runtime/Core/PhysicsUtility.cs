@@ -1,6 +1,5 @@
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEngine;
 using UnityEngine.LowLevelPhysics2D;
 
 namespace ECSPhysics2D
@@ -33,6 +32,30 @@ namespace ECSPhysics2D
       return physicsRotate;
     }
 
+    public static void SetEntityUserData(this PhysicsBody body, Entity entity)
+    {
+      var userData = body.userData;
+      userData.int64Value = ((ulong)(uint)entity.Version << 32) | (uint)entity.Index;
+      body.userData = userData;
+    }
+
+    public static Entity GetEntityUserData(this PhysicsBody body)
+    {
+      if (!body.isValid)
+        return Entity.Null;
+
+      ulong packed = body.userData.int64Value;
+      var entity = new Entity
+      {
+        Index = (int)(packed & 0xFFFFFFFF),
+        Version = (int)(packed >> 32)
+      };
+
+      return entity;
+      // TBD - verify entity still exists?
+      //return em.Exists(entity) ? entity : Entity.Null;
+    }
+
     /// <summary>
     /// Creates a quaternion from Z-axis rotation.
     /// </summary>
@@ -46,13 +69,13 @@ namespace ECSPhysics2D
     /// <summary>
     /// Converts PhysicsBodyType enum to appropriate component types.
     /// </summary>
-    public static ComponentType GetBodyTypeTag(RigidbodyType2D bodyType)
+    public static ComponentType GetBodyTypeTag(PhysicsBody.BodyType bodyType)
     {
       return bodyType switch
       {
-        RigidbodyType2D.Dynamic => ComponentType.ReadOnly<PhysicsDynamicTag>(),
-        RigidbodyType2D.Kinematic => ComponentType.ReadOnly<PhysicsKinematicTag>(),
-        RigidbodyType2D.Static => ComponentType.ReadOnly<PhysicsStaticTag>(),
+        PhysicsBody.BodyType.Dynamic => ComponentType.ReadOnly<PhysicsDynamicTag>(),
+        PhysicsBody.BodyType.Kinematic => ComponentType.ReadOnly<PhysicsKinematicTag>(),
+        PhysicsBody.BodyType.Static => ComponentType.ReadOnly<PhysicsStaticTag>(),
         _ => ComponentType.ReadOnly<PhysicsStaticTag>()
       };
     }

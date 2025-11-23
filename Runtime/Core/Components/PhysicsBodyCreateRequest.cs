@@ -1,6 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEngine;
+using UnityEngine.LowLevelPhysics2D;
 
 namespace ECSPhysics2D
 {
@@ -10,7 +10,7 @@ namespace ECSPhysics2D
   /// </summary>
   public struct PhysicsBodyCreateRequest : IComponentData
   {
-    public RigidbodyType2D BodyType;
+    public PhysicsBody.BodyType BodyType;
     public float2 InitialPosition;
     public float InitialRotation;
   }

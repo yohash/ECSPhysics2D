@@ -39,7 +39,7 @@ namespace ECSPhysics2D
         Distance = hit ? results[0].fraction * MaxDistance : MaxDistance,
         Shape = hit ? results[0].shape : default,
         Body = hit ? results[0].shape.body : default,
-        HitEntity = hit ? GetEntityFromBody(results[0].shape.body) : Entity.Null
+        HitEntity = hit ? results[0].shape.body.GetEntityUserData() : Entity.Null
       };
 
       results.Dispose();
@@ -47,15 +47,6 @@ namespace ECSPhysics2D
       // TODO - verify that we're populating the Results array correctly in parallel
       // TBD - compare with RaycastSystem implementation... do we need to process results
       // afterwards and write to an entity command buffer?
-    }
-
-    private Entity GetEntityFromBody(PhysicsBody body)
-    {
-      if (!body.isValid) {
-        return Entity.Null;
-      }
-      var entityIndex = body.userData.intValue;
-      return new Entity { Index = entityIndex };
     }
   }
 }
