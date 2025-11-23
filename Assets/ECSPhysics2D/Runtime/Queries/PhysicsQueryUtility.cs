@@ -156,19 +156,10 @@ namespace ECSPhysics2D
         Distance = hit ? results[0].fraction * maxDistance : maxDistance,
         Shape = hit ? results[0].shape : default,
         Body = hit ? results[0].shape.body : default,
-        HitEntity = hit ? GetEntityFromBody(results[0].shape.body) : Entity.Null
+        HitEntity = hit ? results[0].shape.body.GetEntityUserData() : Entity.Null
       };
 
       return hit;
-    }
-
-    private static Entity GetEntityFromBody(PhysicsBody body)
-    {
-      if (!body.isValid) {
-        return Entity.Null;
-      }
-      var entityIndex = body.userData.intValue;
-      return new Entity { Index = entityIndex };
     }
 
     /// <summary>

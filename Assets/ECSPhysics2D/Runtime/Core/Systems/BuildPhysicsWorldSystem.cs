@@ -3,7 +3,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 using UnityEngine.LowLevelPhysics2D;
 
 namespace ECSPhysics2D
@@ -62,7 +61,7 @@ namespace ECSPhysics2D
             .WithEntityAccess()) {
         var bodyDef = new PhysicsBodyDefinition
         {
-          bodyType = RigidbodyType2D.Dynamic,
+          type = PhysicsBody.BodyType.Dynamic,
           position = transform.ValueRO.Position.xy,
           rotation = PhysicsUtility.GetRotationZ(transform.ValueRO.Rotation),
           linearVelocity = float2.zero,
@@ -78,9 +77,7 @@ namespace ECSPhysics2D
         bodyComponent.ValueRW.Body = physicsWorld.CreateBody(bodyDef);
 
         // Store entity reference in userData for callbacks
-        var userData = bodyComponent.ValueRW.Body.userData;
-        userData.intValue = entity.Index;
-        bodyComponent.ValueRW.Body.userData = userData;
+        bodyComponent.ValueRW.Body.SetEntityUserData(entity);
 
         // Mark as initialized and preserve Z position
         ecb.AddComponent<PhysicsBodyInitialized>(entity);
@@ -99,17 +96,14 @@ namespace ECSPhysics2D
           .WithEntityAccess()) {
         var bodyDef = new PhysicsBodyDefinition
         {
-          bodyType = RigidbodyType2D.Kinematic,
+          type = PhysicsBody.BodyType.Kinematic,
           position = transform.ValueRO.Position.xy,
           rotation = PhysicsUtility.GetRotationZ(transform.ValueRO.Rotation),
           enabled = true
         };
 
         bodyComponent.ValueRW.Body = physicsWorld.CreateBody(bodyDef);
-
-        var userData = bodyComponent.ValueRW.Body.userData;
-        userData.intValue = entity.Index;
-        bodyComponent.ValueRW.Body.userData = userData;
+        bodyComponent.ValueRW.Body.SetEntityUserData(entity);
 
         ecb.AddComponent<PhysicsBodyInitialized>(entity);
         ecb.AddComponent(entity, new PhysicsTransformPreservation
@@ -127,17 +121,14 @@ namespace ECSPhysics2D
           .WithEntityAccess()) {
         var bodyDef = new PhysicsBodyDefinition
         {
-          bodyType = RigidbodyType2D.Static,
+          type = PhysicsBody.BodyType.Static,
           position = transform.ValueRO.Position.xy,
           rotation = PhysicsUtility.GetRotationZ(transform.ValueRO.Rotation),
           enabled = true
         };
 
         bodyComponent.ValueRW.Body = physicsWorld.CreateBody(bodyDef);
-
-        var userData = bodyComponent.ValueRW.Body.userData;
-        userData.intValue = entity.Index;
-        bodyComponent.ValueRW.Body.userData = userData;
+        bodyComponent.ValueRW.Body.SetEntityUserData(entity);
 
         ecb.AddComponent<PhysicsBodyInitialized>(entity);
         ecb.AddComponent(entity, new PhysicsTransformPreservation
@@ -162,11 +153,6 @@ namespace ECSPhysics2D
           .WithAll<PhysicsKinematicTag, PhysicsBodyInitialized>()) {
         if (!bodyComponent.ValueRO.IsValid)
           continue;
-
-        var physicsTransform = new PhysicsTransform(
-          transform.ValueRO.Position.xy,
-          PhysicsUtility.GetRotationZ(transform.ValueRO.Rotation)
-        );
 
         var body = bodyComponent.ValueRO.Body;
         body.position = transform.ValueRO.Position.xy;

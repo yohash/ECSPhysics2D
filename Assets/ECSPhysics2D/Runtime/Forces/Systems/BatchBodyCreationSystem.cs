@@ -3,7 +3,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 using UnityEngine.LowLevelPhysics2D;
 
 namespace ECSPhysics2D
@@ -30,7 +29,7 @@ namespace ECSPhysics2D
     public struct BatchBodyData
     {
       public int Count;
-      public RigidbodyType2D BodyType;
+      public PhysicsBody.BodyType BodyType;
       public EntityArchetype BodyArchetype;
       public float2 BaseVelocity;
       public float VelocityRandomness;
@@ -89,7 +88,7 @@ namespace ECSPhysics2D
 
           bodyDefinitions[i] = new PhysicsBodyDefinition
           {
-            bodyType = batchData.BodyType,
+            type = batchData.BodyType,
             position = position,
             rotation = PhysicsUtility.GetRotationZ(rotation),
             linearVelocity = velocity,
@@ -148,9 +147,7 @@ namespace ECSPhysics2D
         for (int i = 0; i < bodies.Length; i++) {
           // Copy out the struct to modify it
           var body = bodies[i];
-          var userData = body.userData;
-          userData.intValue = entities[i].Index;
-          body.userData = userData;
+          body.SetEntityUserData(entities[i]);
           // Write entire modified struct back
           bodies[i] = body;
         }

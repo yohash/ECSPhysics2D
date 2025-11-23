@@ -101,7 +101,7 @@ namespace ECSPhysics2D
             {
               Body = overlaps[i].shape.body,
               Shape = overlaps[i].shape,
-              Entity = GetEntityFromBody(overlaps[i].shape.body)
+              Entity = overlaps[i].shape.body.GetEntityUserData()
             });
           }
         }
@@ -112,15 +112,6 @@ namespace ECSPhysics2D
 
       ecb.Playback(state.EntityManager);
       ecb.Dispose();
-    }
-
-    private Entity GetEntityFromBody(PhysicsBody body)
-    {
-      if (!body.isValid) {
-        return Entity.Null;
-      }
-      var entityIndex = body.userData.intValue;
-      return new Entity { Index = entityIndex };
     }
 
     private float2 RotatePoint(float2 point, float angle)
