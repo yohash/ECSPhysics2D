@@ -145,8 +145,6 @@ namespace ECSPhysics2D
     [BurstCompile]
     private void SyncKinematicTransforms(ref SystemState state, PhysicsWorld physicsWorld)
     {
-      var ecb = new EntityCommandBuffer(Allocator.TempJob);
-
       // Kinematic bodies: ECS drives physics transform
       foreach (var (transform, bodyComponent) in
           SystemAPI.Query<RefRO<LocalTransform>, RefRO<PhysicsBodyComponent>>()
