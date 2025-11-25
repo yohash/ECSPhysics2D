@@ -43,5 +43,20 @@ namespace ECSPhysics2D
         Radius = radius
       };
     }
+
+    /// <summary>
+    /// Creates a capsule with arbitrary rotation
+    /// </summary>
+    public static PhysicsShapeCapsule CreateWithRotation(float length, float radius, float rotation)
+    {
+      var halfLength = length * 0.5f - radius;
+      var dir = new float2(math.cos(rotation), math.sin(rotation));
+      return new PhysicsShapeCapsule
+      {
+        Center1 = dir * halfLength,
+        Center2 = -dir * halfLength,
+        Radius = radius
+      };
+    }
   }
 }

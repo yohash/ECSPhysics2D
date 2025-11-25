@@ -95,6 +95,21 @@ namespace ECSPhysics2D
       return polygon;
     }
 
+    public PhysicsShapePolygon Rotate(float rotation)
+    {
+      var cos = math.cos(rotation);
+      var sin = math.sin(rotation);
+      PhysicsShapePolygon rotated = this;
+      for (int i = 0; i < VertexCount; i++) {
+        var v = GetVertex(i);
+        rotated.SetVertex(i, new float2(
+            v.x * cos - v.y * sin,
+            v.x * sin + v.y * cos
+        ));
+      }
+      return rotated;
+    }
+
     public static PhysicsShapePolygon FromBox(PhysicsShapeBox box)
     {
       var halfSize = box.HalfSize;

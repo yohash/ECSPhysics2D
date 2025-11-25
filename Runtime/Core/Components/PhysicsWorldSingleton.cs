@@ -22,6 +22,7 @@ namespace ECSPhysics2D
       {
         gravity = new float2(0f, -9.81f),
         transformPlane = PhysicsWorld.TransformPlane.XY,
+        simulateType = PhysicsWorld.SimulationType.Script,
         simulationSubSteps = 4,
         contactFrequency = 30f,
         contactDamping = 1f,

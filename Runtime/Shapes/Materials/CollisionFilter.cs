@@ -96,5 +96,129 @@ namespace ECSPhysics2D
         GroupIndex = 0
       };
     }
+
+    // Family of Create() overloads for common cases to avoid allocations,
+    // these are burst-friendly
+
+    // Single layer collision
+    public static CollisionFilter Create(int layer, int collidesWith)
+    {
+      return new CollisionFilter
+      {
+        CategoryBits = (uint)(1 << layer),
+        MaskBits = (uint)(1 << collidesWith),
+        GroupIndex = 0
+      };
+    }
+
+    // Two layers
+    public static CollisionFilter Create(int layer, int collidesWith1, int collidesWith2)
+    {
+      return new CollisionFilter
+      {
+        CategoryBits = (uint)(1 << layer),
+        MaskBits = (uint)(1 << collidesWith1) | (uint)(1 << collidesWith2),
+        GroupIndex = 0
+      };
+    }
+
+    // Three layers
+    public static CollisionFilter Create(int layer, int collidesWith1, int collidesWith2, int collidesWith3)
+    {
+      return new CollisionFilter
+      {
+        CategoryBits = (uint)(1 << layer),
+        MaskBits = (uint)(1 << collidesWith1) | (uint)(1 << collidesWith2) | (uint)(1 << collidesWith3),
+        GroupIndex = 0
+      };
+    }
+
+    // Four layers
+    public static CollisionFilter Create(int layer, int collidesWith1, int collidesWith2, int collidesWith3, int collidesWith4)
+    {
+      return new CollisionFilter
+      {
+        CategoryBits = (uint)(1 << layer),
+        MaskBits = (uint)(1 << collidesWith1) | (uint)(1 << collidesWith2) | (uint)(1 << collidesWith3) | (uint)(1 << collidesWith4),
+        GroupIndex = 0
+      };
+    }
+
+    // Five layers
+    public static CollisionFilter Create(int layer, int collidesWith1, int collidesWith2, int collidesWith3, int collidesWith4, int collidesWith5)
+    {
+      return new CollisionFilter
+      {
+        CategoryBits = (uint)(1 << layer),
+        MaskBits = (uint)(1 << collidesWith1) | (uint)(1 << collidesWith2) | (uint)(1 << collidesWith3) | (uint)(1 << collidesWith4) | (uint)(1 << collidesWith5),
+        GroupIndex = 0
+      };
+    }
+
+    // Six layers
+    public static CollisionFilter Create(int layer, int collidesWith1, int collidesWith2, int collidesWith3, int collidesWith4, int collidesWith5, int collidesWith6)
+    {
+      return new CollisionFilter
+      {
+        CategoryBits = (uint)(1 << layer),
+        MaskBits = (uint)(1 << collidesWith1) | (uint)(1 << collidesWith2) | (uint)(1 << collidesWith3) | (uint)(1 << collidesWith4) | (uint)(1 << collidesWith5) | (uint)(1 << collidesWith6),
+        GroupIndex = 0
+      };
+    }
+
+    // Seven layers
+    public static CollisionFilter Create(int layer, int collidesWith1, int collidesWith2, int collidesWith3, int collidesWith4, int collidesWith5, int collidesWith6, int collidesWith7)
+    {
+      return new CollisionFilter
+      {
+        CategoryBits = (uint)(1 << layer),
+        MaskBits = (uint)(1 << collidesWith1) | (uint)(1 << collidesWith2) | (uint)(1 << collidesWith3) | (uint)(1 << collidesWith4) | (uint)(1 << collidesWith5) | (uint)(1 << collidesWith6) | (uint)(1 << collidesWith7),
+        GroupIndex = 0
+      };
+    }
+
+    // Eight layers
+    public static CollisionFilter Create(int layer, int collidesWith1, int collidesWith2, int collidesWith3, int collidesWith4, int collidesWith5, int collidesWith6, int collidesWith7, int collidesWith8)
+    {
+      return new CollisionFilter
+      {
+        CategoryBits = (uint)(1 << layer),
+        MaskBits = (uint)(1 << collidesWith1) | (uint)(1 << collidesWith2) | (uint)(1 << collidesWith3) | (uint)(1 << collidesWith4) | (uint)(1 << collidesWith5) | (uint)(1 << collidesWith6) | (uint)(1 << collidesWith7) | (uint)(1 << collidesWith8),
+        GroupIndex = 0
+      };
+    }
+
+    // Nine layers
+    public static CollisionFilter Create(int layer, int collidesWith1, int collidesWith2, int collidesWith3, int collidesWith4, int collidesWith5, int collidesWith6, int collidesWith7, int collidesWith8, int collidesWith9)
+    {
+      return new CollisionFilter
+      {
+        CategoryBits = (uint)(1 << layer),
+        MaskBits = (uint)(1 << collidesWith1) | (uint)(1 << collidesWith2) | (uint)(1 << collidesWith3) | (uint)(1 << collidesWith4) | (uint)(1 << collidesWith5) | (uint)(1 << collidesWith6) | (uint)(1 << collidesWith7) | (uint)(1 << collidesWith8) | (uint)(1 << collidesWith9),
+        GroupIndex = 0
+      };
+    }
+
+    // Ten layers
+    public static CollisionFilter Create(int layer, int collidesWith1, int collidesWith2, int collidesWith3, int collidesWith4, int collidesWith5, int collidesWith6, int collidesWith7, int collidesWith8, int collidesWith9, int collidesWith10)
+    {
+      return new CollisionFilter
+      {
+        CategoryBits = (uint)(1 << layer),
+        MaskBits = (uint)(1 << collidesWith1) | (uint)(1 << collidesWith2) | (uint)(1 << collidesWith3) | (uint)(1 << collidesWith4) | (uint)(1 << collidesWith5) | (uint)(1 << collidesWith6) | (uint)(1 << collidesWith7) | (uint)(1 << collidesWith8) | (uint)(1 << collidesWith9) | (uint)(1 << collidesWith10),
+        GroupIndex = 0
+      };
+    }
+
+    // Direct mask for complex cases
+    public static CollisionFilter CreateFromMask(int layer, uint collisionMask)
+    {
+      return new CollisionFilter
+      {
+        CategoryBits = (uint)(1 << layer),
+        MaskBits = collisionMask,
+        GroupIndex = 0
+      };
+    }
   }
 }
