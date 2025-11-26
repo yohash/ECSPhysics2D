@@ -6,7 +6,6 @@ namespace ECSPhysics2D
   /// </summary>
   public static class CollisionLayers
   {
-    // TODO - allow this to be edited publicly, potentially with a custom editor
     public const int Default = 0;
     public const int Player = 1;
     public const int Enemy = 2;

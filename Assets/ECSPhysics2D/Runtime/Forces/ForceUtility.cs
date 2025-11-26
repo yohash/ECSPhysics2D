@@ -29,7 +29,7 @@ namespace ECSPhysics2D
     /// Calculate explosion impulse with falloff.
     /// </summary>
     public static float2 CalculateExplosionImpulse(float2 bodyPosition, float2 explosionCenter,
-        float explosionForce, float explosionRadius, PhysicsExplosion.ExplosionFalloff falloff)
+        float explosionForce, float explosionRadius, float falloff)
     {
       var delta = bodyPosition - explosionCenter;
       var distance = math.length(delta);
@@ -40,19 +40,11 @@ namespace ECSPhysics2D
       var direction = delta / distance;
       float forceMagnitude = explosionForce;
 
-      switch (falloff) {
-        case PhysicsExplosion.ExplosionFalloff.Linear:
-          forceMagnitude *= (1f - distance / explosionRadius);
-          break;
-
-        case PhysicsExplosion.ExplosionFalloff.Quadratic:
-          var t = 1f - distance / explosionRadius;
-          forceMagnitude *= t * t;
-          break;
-
-        case PhysicsExplosion.ExplosionFalloff.Constant:
-          // Force is constant within radius
-          break;
+      // scale for linear falloff beyond radius in the "falloff" distance
+      if (falloff > 0f && distance > explosionRadius) {
+        forceMagnitude *= math.max(0f, 1f - (distance - explosionRadius) / falloff);
+      } else {
+        forceMagnitude *= (1f - distance / explosionRadius);
       }
 
       return direction * forceMagnitude;

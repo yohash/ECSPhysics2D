@@ -27,9 +27,8 @@ namespace ECSPhysics2D.Samples.FallingShapes
 
       var deltaTime = SystemAPI.Time.DeltaTime;
 
-      bool shouldSpawnRandom = Keyboard.current != null && Keyboard.current.aKey.wasPressedThisFrame;
       bool shouldSpawnContinuous = false;
-      bool shouldSpawnMouse = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+      bool shouldExplodeMouse = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
       float2 mousePos = float2.zero;
 
       // Update config state BEFORE any structural changes
@@ -48,17 +47,13 @@ namespace ECSPhysics2D.Samples.FallingShapes
       var spawnConfig = config.ValueRO;
 
       // Now do structural changes (entity creation)
-      if (shouldSpawnRandom) {
-        SpawnRandomShape(ref state, spawnConfig);
-      }
-
       if (shouldSpawnContinuous) {
         SpawnRandomShape(ref state, spawnConfig);
       }
 
-      if (shouldSpawnMouse) {
+      if (shouldExplodeMouse) {
         mousePos = GetMouseWorldPosition();
-        SpawnShapeAtPosition(ref state, mousePos, spawnConfig);
+        CreateExplosion(ref state, mousePos);
       }
     }
 
@@ -84,6 +79,20 @@ namespace ECSPhysics2D.Samples.FallingShapes
 
       state.EntityManager.AddComponentData(requestEntity,
           SpawnShapeRequest.CreateRandom(position, size));
+    }
+
+    private void CreateExplosion(ref SystemState state, float2 position)
+    {
+      var explosionEntity = state.EntityManager.CreateEntity();
+
+      state.EntityManager.AddComponentData(explosionEntity, new PhysicsExplosion
+      {
+        Center = position,
+        Radius = 1.5f,
+        Force = 10f,
+        Falloff = 1f,
+        AffectedLayers = CollisionLayers.Filters.ExplosionTargets.CategoryBits
+      });
     }
 
     private float2 GetMouseWorldPosition()
