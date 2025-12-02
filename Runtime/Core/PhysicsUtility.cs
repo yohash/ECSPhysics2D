@@ -32,11 +32,36 @@ namespace ECSPhysics2D
       return physicsRotate;
     }
 
+    public static PhysicsTransform PhysicsTransform(float2 position)
+    {
+      return new PhysicsTransform
+      {
+        position = position,
+        rotation = GetRotationZ(0)
+      };
+    }
+
+    public static PhysicsTransform PhysicsTransform(float2 position, float rotation)
+    {
+      return new PhysicsTransform
+      {
+        position = position,
+        rotation = GetRotationZ(rotation)
+      };
+    }
+
     public static void SetEntityUserData(this PhysicsBody body, Entity entity)
     {
       var userData = body.userData;
       userData.int64Value = ((ulong)(uint)entity.Version << 32) | (uint)entity.Index;
       body.userData = userData;
+    }
+
+    public static void SetEntityUserData(this PhysicsJoint joint, Entity entity)
+    {
+      var userData = joint.userData;
+      userData.int64Value = ((ulong)(uint)entity.Version << 32) | (uint)entity.Index;
+      joint.userData = userData;
     }
 
     public static Entity GetEntityUserData(this PhysicsBody body)
@@ -54,16 +79,6 @@ namespace ECSPhysics2D
       return entity;
       // TBD - verify entity still exists?
       //return em.Exists(entity) ? entity : Entity.Null;
-    }
-
-    /// <summary>
-    /// Creates a quaternion from Z-axis rotation.
-    /// </summary>
-    public static quaternion CreateRotationZ(PhysicsRotate rotation)
-    {
-      var degrees = rotation.angle;
-      var radians = math.radians(degrees);
-      return quaternion.RotateZ(radians);
     }
 
     /// <summary>
