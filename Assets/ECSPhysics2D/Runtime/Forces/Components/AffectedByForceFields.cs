@@ -7,5 +7,4 @@ namespace ECSPhysics2D
   /// Opt-in for performance - not all bodies need force field checks.
   /// </summary>
   public struct AffectedByForceFields : IComponentData { }
-
 }

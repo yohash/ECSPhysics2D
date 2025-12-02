@@ -51,8 +51,7 @@ namespace ECSPhysics2D
         );
 
         // Update rotation (2D rotation around Z axis)
-        transform.ValueRW.Rotation = PhysicsUtility.CreateRotationZ(body.rotation);
-
+        transform.ValueRW.Rotation = quaternion.RotateZ(body.rotation.angle);
         // Scale is preserved from original value (physics doesn't affect scale)
         transform.ValueRW.Scale = preservation.ValueRO.Scale.x;
       }

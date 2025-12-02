@@ -3,7 +3,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine.LowLevelPhysics2D;
-using static UnityEngine.LowLevelPhysics2D.PhysicsShape;
 
 namespace ECSPhysics2D
 {
@@ -56,14 +55,14 @@ namespace ECSPhysics2D
         PhysicsMaterial material, CollisionFilter filter)
     {
       PhysicsShapeDefinition shapeDef = default;
-      shapeDef.surfaceMaterial = new SurfaceMaterial
+      shapeDef.surfaceMaterial = new PhysicsShape.SurfaceMaterial
       {
         friction = material.Friction,
         bounciness = material.Bounciness
       };
       shapeDef.density = material.Density;
       shapeDef.isTrigger = false;
-      shapeDef.contactFilter = new ContactFilter
+      shapeDef.contactFilter = new PhysicsShape.ContactFilter
       {
         categories = filter.Categories(),
         contacts = filter.Mask(),
@@ -101,7 +100,7 @@ namespace ECSPhysics2D
           var boxGeometry = new PolygonGeometry
           {
             count = 4,
-            vertices = new ShapeArray
+            vertices = new PhysicsShape.ShapeArray
             {
               vertex0 = vertices[0],
               vertex1 = vertices[1],
