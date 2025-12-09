@@ -38,10 +38,14 @@ namespace ECSPhysics2D
     private void CreateCircleShapes(ref SystemState state, EntityCommandBuffer ecb)
     {
       foreach (var (body, shape, material, filter, entity) in
-          SystemAPI.Query<RefRO<PhysicsBodyComponent>, RefRO<PhysicsShapeCircle>,
-              RefRO<PhysicsMaterial>, RefRO<CollisionFilter>>()
+          SystemAPI.Query<
+            RefRO<PhysicsBodyComponent>,
+            RefRO<PhysicsShapeCircle>,
+            RefRO<PhysicsMaterial>,
+            RefRO<CollisionFilter>>()
           .WithNone<ShapesCreatedTag>()
           .WithEntityAccess()) {
+
         if (!body.ValueRO.IsValid)
           continue;
 
@@ -53,7 +57,8 @@ namespace ECSPhysics2D
             bounciness = material.ValueRO.Bounciness
           },
           density = material.ValueRO.Density,
-          isTrigger = false,
+          isTrigger = filter.ValueRO.GenerateTriggerEvents,
+          contactEvents = filter.ValueRO.GenerateCollisionEvents,
           contactFilter = new PhysicsShape.ContactFilter
           {
             categories = filter.ValueRO.Categories(),
@@ -75,6 +80,10 @@ namespace ECSPhysics2D
           physicsShape.rollingResistance = material.ValueRO.RollingResistance;
         }
 
+        // Store shape reference for runtime modification
+        var shapeBuffer = ecb.AddBuffer<PhysicsShapeReference>(entity);
+        shapeBuffer.Add(new PhysicsShapeReference { Shape = physicsShape });
+
         ecb.AddComponent(entity, new ShapesCreatedTag { ShapeCount = 1 });
       }
     }
@@ -82,8 +91,11 @@ namespace ECSPhysics2D
     private void CreateBoxShapes(ref SystemState state, EntityCommandBuffer ecb)
     {
       foreach (var (body, shape, material, filter, entity) in
-          SystemAPI.Query<RefRO<PhysicsBodyComponent>, RefRO<PhysicsShapeBox>,
-              RefRO<PhysicsMaterial>, RefRO<CollisionFilter>>()
+          SystemAPI.Query<
+            RefRO<PhysicsBodyComponent>,
+            RefRO<PhysicsShapeBox>,
+            RefRO<PhysicsMaterial>,
+            RefRO<CollisionFilter>>()
           .WithNone<ShapesCreatedTag>()
           .WithEntityAccess()) {
         if (!body.ValueRO.IsValid)
@@ -109,7 +121,8 @@ namespace ECSPhysics2D
             bounciness = material.ValueRO.Bounciness
           },
           density = material.ValueRO.Density,
-          isTrigger = false,
+          isTrigger = filter.ValueRO.GenerateTriggerEvents,
+          contactEvents = filter.ValueRO.GenerateCollisionEvents,
           contactFilter = new PhysicsShape.ContactFilter
           {
             categories = filter.ValueRO.Categories(),
@@ -143,6 +156,10 @@ namespace ECSPhysics2D
 
         var physicsShape = body.ValueRO.Body.CreateShape(shapeGeometry, shapeDef);
 
+        // Store shape reference for runtime modification
+        var shapeBuffer = ecb.AddBuffer<PhysicsShapeReference>(entity);
+        shapeBuffer.Add(new PhysicsShapeReference { Shape = physicsShape });
+
         if (material.ValueRO.RollingResistance > 0) {
           physicsShape.rollingResistance = material.ValueRO.RollingResistance;
         }
@@ -155,8 +172,11 @@ namespace ECSPhysics2D
     private void CreateCapsuleShapes(ref SystemState state, EntityCommandBuffer ecb)
     {
       foreach (var (body, shape, material, filter, entity) in
-          SystemAPI.Query<RefRO<PhysicsBodyComponent>, RefRO<PhysicsShapeCapsule>,
-              RefRO<PhysicsMaterial>, RefRO<CollisionFilter>>()
+          SystemAPI.Query<
+            RefRO<PhysicsBodyComponent>,
+            RefRO<PhysicsShapeCapsule>,
+            RefRO<PhysicsMaterial>,
+            RefRO<CollisionFilter>>()
           .WithNone<ShapesCreatedTag>()
           .WithEntityAccess()) {
         if (!body.ValueRO.IsValid)
@@ -170,7 +190,8 @@ namespace ECSPhysics2D
             bounciness = material.ValueRO.Bounciness
           },
           density = material.ValueRO.Density,
-          isTrigger = false,
+          isTrigger = filter.ValueRO.GenerateTriggerEvents,
+          contactEvents = filter.ValueRO.GenerateCollisionEvents,
           contactFilter = new PhysicsShape.ContactFilter
           {
             categories = filter.ValueRO.Categories(),
@@ -188,6 +209,10 @@ namespace ECSPhysics2D
 
         var physicsShape = body.ValueRO.Body.CreateShape(shapeGeometry, shapeDef);
 
+        // Store shape reference for runtime modification
+        var shapeBuffer = ecb.AddBuffer<PhysicsShapeReference>(entity);
+        shapeBuffer.Add(new PhysicsShapeReference { Shape = physicsShape });
+
         if (material.ValueRO.RollingResistance > 0) {
           physicsShape.rollingResistance = material.ValueRO.RollingResistance;
         }
@@ -199,8 +224,11 @@ namespace ECSPhysics2D
     private void CreatePolygonShapes(ref SystemState state, EntityCommandBuffer ecb)
     {
       foreach (var (body, shape, material, filter, entity) in
-          SystemAPI.Query<RefRO<PhysicsBodyComponent>, RefRO<PhysicsShapePolygon>,
-              RefRO<PhysicsMaterial>, RefRO<CollisionFilter>>()
+          SystemAPI.Query<
+            RefRO<PhysicsBodyComponent>,
+            RefRO<PhysicsShapePolygon>,
+            RefRO<PhysicsMaterial>,
+            RefRO<CollisionFilter>>()
           .WithNone<ShapesCreatedTag>()
           .WithEntityAccess()) {
         if (!body.ValueRO.IsValid)
@@ -232,7 +260,8 @@ namespace ECSPhysics2D
             bounciness = material.ValueRO.Bounciness
           },
           density = material.ValueRO.Density,
-          isTrigger = false,
+          isTrigger = filter.ValueRO.GenerateTriggerEvents,
+          contactEvents = filter.ValueRO.GenerateCollisionEvents,
           contactFilter = new PhysicsShape.ContactFilter
           {
             categories = filter.ValueRO.Categories(),
@@ -260,6 +289,10 @@ namespace ECSPhysics2D
         }.Validate();
 
         var physicsShape = body.ValueRO.Body.CreateShape(shapeGeometry, shapeDef);
+
+        // Store shape reference for runtime modification
+        var shapeBuffer = ecb.AddBuffer<PhysicsShapeReference>(entity);
+        shapeBuffer.Add(new PhysicsShapeReference { Shape = physicsShape });
 
         if (material.ValueRO.RollingResistance > 0) {
           physicsShape.rollingResistance = material.ValueRO.RollingResistance;
@@ -301,7 +334,7 @@ namespace ECSPhysics2D
             friction = material.ValueRO.Friction,
             bounciness = material.ValueRO.Bounciness
           },
-          triggerEvents = false
+          triggerEvents = filter.ValueRO.GenerateTriggerEvents,
         };
 
 

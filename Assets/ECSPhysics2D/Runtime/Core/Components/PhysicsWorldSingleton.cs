@@ -26,6 +26,8 @@ namespace ECSPhysics2D
         simulationSubSteps = 4,
         contactFrequency = 30f,
         contactDamping = 1f,
+
+        contactHitEventThreshold = 0.01f,
       };
 
       return new PhysicsWorldSingleton

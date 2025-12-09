@@ -28,6 +28,17 @@ namespace ECSPhysics2D
     /// </summary>
     public short GroupIndex;
 
+    /// <summary>
+    /// If true, collision events will be generated for this shape
+    /// Objects must be kinetic or dynamic to generate events
+    /// </summary>
+    public bool GenerateCollisionEvents;
+
+    /// <summary>
+    /// If true, trigger events will be generated for this shape
+    /// </summary>
+    public bool GenerateTriggerEvents;
+
     public PhysicsMask Categories()
     {
       return new PhysicsMask
@@ -219,6 +230,42 @@ namespace ECSPhysics2D
         MaskBits = collisionMask,
         GroupIndex = 0
       };
+    }
+  }
+
+  public static class CollisionFilterExtensions
+  {
+    /// <summary>
+    /// Sets the filter to collide with all categories
+    /// </summary>
+    public static void SetCollideWithAll(this ref CollisionFilter filter)
+    {
+      filter.MaskBits = 0xFFFFFFFF;
+    }
+    /// <summary>
+    /// Sets the filter to not collide with any categories
+    /// </summary>
+    public static void SetCollideWithNone(this ref CollisionFilter filter)
+    {
+      filter.MaskBits = 0x00000000;
+    }
+
+    /// <summary>
+    /// Sets the filter to generate collision events.
+    /// </summary>
+    public static CollisionFilter WithCollisionEvents(this CollisionFilter filter, bool enable = true)
+    {
+      filter.GenerateCollisionEvents = enable;
+      return filter;
+    }
+
+    /// <summary>
+    /// Sets the filter to generate trigger events.
+    /// </summary>
+    public static CollisionFilter WithTriggerEvents(this CollisionFilter filter, bool enable = true)
+    {
+      filter.GenerateTriggerEvents = enable;
+      return filter;
     }
   }
 }

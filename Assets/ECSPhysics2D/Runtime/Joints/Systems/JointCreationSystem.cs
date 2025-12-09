@@ -1,5 +1,3 @@
-using ECSPhysics2D;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine.LowLevelPhysics2D;
@@ -89,8 +87,6 @@ namespace ECSPhysics2D
         jointComponent.ValueRW.Joint.SetEntityUserData(entity);
 
         ecb.AddComponent<JointCreatedTag>(entity);
-        AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyA, entity, true);
-        AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyB, entity, false);
       }
     }
 
@@ -133,8 +129,6 @@ namespace ECSPhysics2D
         jointComponent.ValueRW.Joint.SetEntityUserData(entity);
 
         ecb.AddComponent<JointCreatedTag>(entity);
-        AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyA, entity, true);
-        AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyB, entity, false);
       }
     }
 
@@ -179,8 +173,6 @@ namespace ECSPhysics2D
         jointComponent.ValueRW.Joint.SetEntityUserData(entity);
 
         ecb.AddComponent<JointCreatedTag>(entity);
-        AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyA, entity, true);
-        AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyB, entity, false);
       }
     }
 
@@ -224,8 +216,6 @@ namespace ECSPhysics2D
         jointComponent.ValueRW.Joint.SetEntityUserData(entity);
 
         ecb.AddComponent<JointCreatedTag>(entity);
-        AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyA, entity, true);
-        AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyB, entity, false);
       }
     }
 
@@ -264,8 +254,6 @@ namespace ECSPhysics2D
         jointComponent.ValueRW.Joint.SetEntityUserData(entity);
 
         ecb.AddComponent<JointCreatedTag>(entity);
-        AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyA, entity, true);
-        AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyB, entity, false);
       }
     }
 
@@ -344,15 +332,6 @@ namespace ECSPhysics2D
       //  ecb.AddComponent<JointCreatedTag>(entity);
       //  AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyB, entity, false);
       //}
-    }
-
-    private void AddJointReferenceToBody(ref SystemState state, EntityCommandBuffer ecb, Entity bodyEntity, Entity jointEntity, bool isBodyA)
-    {
-      if (!SystemAPI.HasBuffer<JointReference>(bodyEntity)) {
-        ecb.AddBuffer<JointReference>(bodyEntity);
-      }
-      // Note: Can't append to buffer in ECB directly, need to do this in a follow-up system
-      // or use a different approach for immediate buffer updates
     }
   }
 }

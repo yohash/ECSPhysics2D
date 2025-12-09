@@ -27,13 +27,13 @@ namespace ECSPhysics2D
     /// Total events this frame across all types.
     /// </summary>
     public int TotalEventCount =>
-        CollisionEventCount + TriggerEventCount + SleepEventCount + JointThresholdEventCount;
+      CollisionEventCount + TriggerEventCount + SleepEventCount + JointThresholdEventCount;
 
     /// <summary>
     /// Whether any overflow buffer was used this frame.
     /// If consistently true, consider increasing hot buffer sizes.
     /// </summary>
     public bool AnyOverflowUsed =>
-        CollisionOverflowUsed || TriggerOverflowUsed || SleepOverflowUsed || JointThresholdOverflowUsed;
+      CollisionOverflowUsed || TriggerOverflowUsed || SleepOverflowUsed || JointThresholdOverflowUsed;
   }
 }

@@ -193,9 +193,9 @@ namespace ECSPhysics2D
 
           if (element.Delay <= 0) {
             if (element.UseWorldPoint) {
-              physicsBody.ApplyForce(element.Impulse, element.Point);
+              physicsBody.ApplyLinearImpulse(element.Impulse, element.Point);
             } else {
-              physicsBody.ApplyForceToCenter(element.Impulse);
+              physicsBody.ApplyLinearImpulseToCenter(element.Impulse);
             }
 
             impulseQueue.RemoveAt(i);
