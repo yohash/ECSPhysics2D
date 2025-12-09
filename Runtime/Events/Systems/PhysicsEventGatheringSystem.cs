@@ -169,8 +169,9 @@ namespace ECSPhysics2D
       float2 position = new float2(body.position.x, body.position.y);
       float2 r = worldPoint - position;
 
-      float2 rotationalVel = new float2(-body.angularVelocity * r.y,
-                                         body.angularVelocity * r.x);
+      float2 rotationalVel = new float2(
+        -body.angularVelocity * r.y,
+        body.angularVelocity * r.x);
 
       float2 linearVelocity = new float2(body.linearVelocity.x, body.linearVelocity.y);
       return linearVelocity + rotationalVel;

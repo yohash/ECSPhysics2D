@@ -12,7 +12,7 @@ namespace ECSPhysics2D
     /// Reference to the event buffer container.
     /// Access via GetBuffers() to get the actual buffer struct.
     /// </summary>
-    internal PhysicsEventBuffers Buffers;
+    public PhysicsEventBuffers Buffers;
 
     /// <summary>
     /// Configuration for buffer sizes.

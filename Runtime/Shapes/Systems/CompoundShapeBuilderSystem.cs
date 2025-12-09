@@ -31,42 +31,56 @@ namespace ECSPhysics2D
         if (!body.ValueRO.IsValid || shapeBuffer.IsEmpty)
           continue;
 
+        var shapeRefs = new NativeList<PhysicsShape>(shapeBuffer.Length, Allocator.Temp);
+
         int shapesCreated = 0;
 
         for (int i = 0; i < shapeBuffer.Length; i++) {
           var element = shapeBuffer[i];
 
-          if (!CreateCompoundShape(body.ValueRO.Body, element, material.ValueRO, filter.ValueRO))
-            continue;
+          var createdShape = CreateCompoundShape(body.ValueRO.Body, element, material.ValueRO, filter.ValueRO);
+          if (createdShape.isValid) {
+            shapeRefs.Add(createdShape);
+          }
 
           shapesCreated++;
         }
 
         if (shapesCreated > 0) {
+          var refBuffer = ecb.AddBuffer<PhysicsShapeReference>(entity);
+          for (int i = 0; i < shapeRefs.Length; i++) {
+            refBuffer.Add(new PhysicsShapeReference { Shape = shapeRefs[i] });
+          }
+
           ecb.AddComponent(entity, new ShapesCreatedTag { ShapeCount = shapesCreated });
         }
+
+        shapeRefs.Dispose();
       }
 
       ecb.Playback(state.EntityManager);
       ecb.Dispose();
     }
 
-    private bool CreateCompoundShape(PhysicsBody body, CompoundShape element,
+    private PhysicsShape CreateCompoundShape(PhysicsBody body, CompoundShape element,
         PhysicsMaterial material, CollisionFilter filter)
     {
-      PhysicsShapeDefinition shapeDef = default;
-      shapeDef.surfaceMaterial = new PhysicsShape.SurfaceMaterial
+      var shapeDef = new PhysicsShapeDefinition
       {
-        friction = material.Friction,
-        bounciness = material.Bounciness
-      };
-      shapeDef.density = material.Density;
-      shapeDef.isTrigger = false;
-      shapeDef.contactFilter = new PhysicsShape.ContactFilter
-      {
-        categories = filter.Categories(),
-        contacts = filter.Mask(),
-        groupIndex = filter.GroupIndex
+        surfaceMaterial = new PhysicsShape.SurfaceMaterial
+        {
+          friction = material.Friction,
+          bounciness = material.Bounciness
+        },
+        density = material.Density,
+        isTrigger = filter.GenerateTriggerEvents,
+        contactEvents = filter.GenerateCollisionEvents,
+        contactFilter = new PhysicsShape.ContactFilter
+        {
+          categories = filter.Categories(),
+          contacts = filter.Mask(),
+          groupIndex = filter.GroupIndex
+        }
       };
 
       switch (element.Type) {
@@ -82,7 +96,7 @@ namespace ECSPhysics2D
             circleShape.rollingResistance = material.RollingResistance;
           }
 
-          return circleShape.isValid;
+          return circleShape;
 
         case CompoundShape.ShapeType.Box:
           // Box is created as a 4-vertex polygon
@@ -115,7 +129,7 @@ namespace ECSPhysics2D
           }
 
           vertices.Dispose();
-          return boxShape.isValid;
+          return boxShape;
 
         case CompoundShape.ShapeType.Capsule:
           var capsuleGeometry = new CapsuleGeometry
@@ -131,14 +145,14 @@ namespace ECSPhysics2D
             capsuleShape.rollingResistance = material.RollingResistance;
           }
 
-          return capsuleShape.isValid;
+          return capsuleShape;
 
         case CompoundShape.ShapeType.Polygon:
           // TBD
-          return false;
+          return default;
 
         default:
-          return false;
+          return default;
       }
     }
 

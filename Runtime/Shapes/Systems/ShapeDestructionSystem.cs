@@ -24,6 +24,16 @@ namespace ECSPhysics2D
         }
       }
 
+      // Clean up chain blobs for destroyed bodies
+      foreach (var (body, chainShape, entity) in
+          SystemAPI.Query<RefRO<PhysicsBodyComponent>, RefRO<PhysicsShapeChain>>()
+          .WithEntityAccess()) {
+        if (!body.ValueRO.IsValid && chainShape.ValueRO.ChainBlob.IsCreated) {
+          chainShape.ValueRO.ChainBlob.Dispose();
+          ecb.RemoveComponent<PhysicsShapeChain>(entity);
+        }
+      }
+
       ecb.Playback(state.EntityManager);
       ecb.Dispose();
     }
