@@ -64,6 +64,7 @@ namespace ECSPhysics2D
           type = PhysicsBody.BodyType.Dynamic,
           position = transform.ValueRO.Position.xy,
           rotation = PhysicsUtility.GetRotationZ(transform.ValueRO.Rotation),
+          fastCollisionsAllowed = bodyComponent.ValueRO.EnableCCD,
           linearVelocity = float2.zero,
           angularVelocity = 0f,
           linearDamping = 0f,
@@ -99,6 +100,7 @@ namespace ECSPhysics2D
           type = PhysicsBody.BodyType.Kinematic,
           position = transform.ValueRO.Position.xy,
           rotation = PhysicsUtility.GetRotationZ(transform.ValueRO.Rotation),
+          fastCollisionsAllowed = bodyComponent.ValueRO.EnableCCD,
           enabled = true
         };
 

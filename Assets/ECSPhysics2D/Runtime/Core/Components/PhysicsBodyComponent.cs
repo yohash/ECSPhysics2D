@@ -11,6 +11,8 @@ namespace ECSPhysics2D
   {
     public PhysicsBody Body;
     public int WorldIndex; // For future multi-world support
+    // Enable Continuous Collision Detection (prevents tunneling)
+    public bool EnableCCD;
 
     public bool IsValid => Body.isValid;
   }
