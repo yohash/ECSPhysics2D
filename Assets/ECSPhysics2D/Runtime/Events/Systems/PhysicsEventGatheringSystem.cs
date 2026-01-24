@@ -73,6 +73,31 @@ namespace ECSPhysics2D
         }
         point /= manifold.pointCount;
 
+        // Get full velocities at contact point
+        float2 velA = GetVelocityAtPoint(rawEvent.shapeA.body, point);
+        float2 velB = GetVelocityAtPoint(rawEvent.shapeB.body, point);
+        float2 relativeVel = velA - velB;
+
+        // Decompose into normal and tangent
+        float2 normal = rawEvent.contactId.contact.manifold.normal;
+        float normalSpeed = math.dot(relativeVel, normal);
+        float2 tangentVel = relativeVel - (normalSpeed * normal);
+        float tangentSpeed = math.length(tangentVel);
+
+        // Calculate reduced mass
+        float massA = rawEvent.shapeA.body.mass;
+        float massB = rawEvent.shapeB.body.mass;
+        float reducedMass = (massA * massB) / (massA + massB);
+
+        // Normal impulse (separation force)
+        float normalImpulse = math.abs(normalSpeed) * reducedMass;
+
+        // Tangent impulse (friction, clamped by Coulomb's law)
+        float friction = math.max(rawEvent.shapeA.friction, rawEvent.shapeB.friction);
+        float maxTangentImpulse = friction * normalImpulse;
+        float uncappedTangent = tangentSpeed * reducedMass;
+        float tangentImpulse = math.min(uncappedTangent, maxTangentImpulse);
+
         var evt = new CollisionEvent
         {
           EntityA = rawEvent.shapeA.body.GetEntityUserData(),
@@ -83,8 +108,8 @@ namespace ECSPhysics2D
           ShapeB = rawEvent.shapeB,
           ContactPoint = point,
           ContactNormal = rawEvent.contactId.contact.manifold.normal,
-          NormalImpulse = 0f,  // Begin events don't have impulse yet
-          TangentImpulse = 0f,
+          NormalImpulse = normalImpulse,
+          TangentImpulse = tangentImpulse,
           EventType = CollisionEventType.Begin
         };
 

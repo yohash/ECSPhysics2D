@@ -23,7 +23,6 @@ namespace ECSPhysics2D
 #else
       _enabled = false;
 #endif
-      _enabled = true;
     }
 
     public void OnUpdate(ref SystemState state)

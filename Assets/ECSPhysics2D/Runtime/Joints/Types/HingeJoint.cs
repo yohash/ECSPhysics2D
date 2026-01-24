@@ -1,5 +1,4 @@
 using Unity.Entities;
-using Unity.Hierarchy;
 using Unity.Mathematics;
 
 namespace ECSPhysics2D
@@ -16,8 +15,8 @@ namespace ECSPhysics2D
 
     // Angle limits
     public bool EnableLimit;
-    public float LowerAngle;        // Minimum angle (radians)
-    public float UpperAngle;        // Maximum angle (radians)
+    public float LowerAngle;        // Minimum angle (degrees)
+    public float UpperAngle;        // Maximum angle (degrees)
 
     // Motor properties
     public bool EnableMotor;
