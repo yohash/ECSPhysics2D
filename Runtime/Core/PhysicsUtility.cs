@@ -12,10 +12,8 @@ namespace ECSPhysics2D
     /// </summary>
     public static PhysicsRotate GetRotationZ(float rotation)
     {
-      // For 2D rotation around Z axis
-      float3 euler = math.degrees(rotation);
-
-      var physicsRotate = new PhysicsRotate(euler.z);
+      // For 2D rotation around Z axis (expects radians)
+      var physicsRotate = new PhysicsRotate(rotation);
       return physicsRotate;
     }
 
@@ -25,8 +23,8 @@ namespace ECSPhysics2D
     /// </summary>
     public static PhysicsRotate GetRotationZ(quaternion rotation)
     {
-      // For 2D rotation around Z axis
-      float3 euler = math.degrees(math.Euler(rotation));
+      // For 2D rotation around Z axis (PhysicsRotate expects radians)
+      float3 euler = math.Euler(rotation);  // Returns radians
 
       var physicsRotate = new PhysicsRotate(euler.z);
       return physicsRotate;

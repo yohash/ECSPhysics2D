@@ -34,6 +34,10 @@ namespace ECSPhysics2D
     [BurstCompile]
     private void SyncDynamicTransforms(ref SystemState state)
     {
+      // Get fresh physics world reference
+      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var worldSingleton))
+        return;
+
       // Dynamic bodies: Physics drives ECS transform
       foreach (var (transform, bodyComponent, preservation) in
           SystemAPI.Query<RefRW<LocalTransform>, RefRO<PhysicsBodyComponent>, RefRO<PhysicsTransformPreservation>>()

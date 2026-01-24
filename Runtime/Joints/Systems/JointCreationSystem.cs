@@ -1,4 +1,4 @@
-using Unity.Collections;
+﻿using Unity.Collections;
 using Unity.Entities;
 using UnityEngine.LowLevelPhysics2D;
 
@@ -7,9 +7,10 @@ namespace ECSPhysics2D
   /// <summary>
   /// System that creates joints between physics bodies.
   /// Joints are separate entities that reference two body entities.
+  /// This sytem runs after shapes are created but before physics simulation.
   /// </summary>
   [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
-  [UpdateAfter(typeof(BuildPhysicsWorldSystem))]
+  [UpdateAfter(typeof(ShapeCreationSystem))]
   [UpdateBefore(typeof(PhysicsSimulationSystem))]
   //[BurstCompile]
   public partial struct JointCreationSystem : ISystem
