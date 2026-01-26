@@ -50,7 +50,8 @@ namespace ECSPhysics2D.Samples.JointBreaking
       ecb.AddComponent(anchorEntity, new PhysicsBodyComponent
       {
         Body = default,
-        WorldIndex = 0
+        WorldIndex = 0,
+        GravityScale = 1f
       });
       ecb.AddComponent<PhysicsStaticTag>(anchorEntity);
 
@@ -84,7 +85,8 @@ namespace ECSPhysics2D.Samples.JointBreaking
       ecb.AddComponent(centralEntity, new PhysicsBodyComponent
       {
         Body = default,
-        WorldIndex = 0
+        WorldIndex = 0,
+        GravityScale = 1f
       });
       ecb.AddComponent<PhysicsDynamicTag>(centralEntity);
 
@@ -102,20 +104,6 @@ namespace ECSPhysics2D.Samples.JointBreaking
       });
 
       ecb.AddComponent(centralEntity, CollisionFilter.Create(1, 0, 1).WithCollisionEvents());
-
-      ecb.AddComponent(centralEntity, new PhysicsVelocity
-      {
-        Linear = float2.zero,
-        Angular = config.RotationSpeed  // Start with initial spin
-      });
-
-      ecb.AddComponent(centralEntity, new PhysicsDamping
-      {
-        Linear = 0f,
-        Angular = 0f  // No damping - motor maintains speed
-      });
-
-      ecb.AddComponent(centralEntity, new PhysicsGravityModifier { Scale = 0f });
 
       // WindmillMotor component for velocity control
       ecb.AddComponent(centralEntity, WindmillMotor.Create(config.RotationSpeed, config.MaxTorque));
@@ -168,7 +156,8 @@ namespace ECSPhysics2D.Samples.JointBreaking
         ecb.AddComponent(spokeEntity, new PhysicsBodyComponent
         {
           Body = default,
-          WorldIndex = 0
+          WorldIndex = 0,
+          GravityScale = 1f
         });
         ecb.AddComponent<PhysicsDynamicTag>(spokeEntity);
 
@@ -187,20 +176,6 @@ namespace ECSPhysics2D.Samples.JointBreaking
         });
 
         ecb.AddComponent(spokeEntity, CollisionFilter.Create(1, 0, 1).WithCollisionEvents());
-
-        ecb.AddComponent(spokeEntity, new PhysicsVelocity
-        {
-          Linear = float2.zero,
-          Angular = 0f
-        });
-
-        ecb.AddComponent(spokeEntity, new PhysicsDamping
-        {
-          Linear = 0f,
-          Angular = 0f
-        });
-
-        ecb.AddComponent(spokeEntity, new PhysicsGravityModifier { Scale = 1f });
 
         // ===== Create Weld Joint connecting spoke to central circle =====
         var weldJointEntity = ecb.CreateEntity();

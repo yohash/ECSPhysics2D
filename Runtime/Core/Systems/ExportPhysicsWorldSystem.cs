@@ -21,13 +21,10 @@ namespace ECSPhysics2D
       if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var physicsWorldSingleton))
         return;
 
-      // ===== Step 1: Sync Dynamic body transforms FROM physics =====
+      // Step 1: Sync Dynamic body transforms FROM physics
       SyncDynamicTransforms(ref state);
 
-      // ===== Step 2: Update velocity components =====
-      UpdateVelocityComponents(ref state);
-
-      // ===== Step 3: Handle destroyed bodies =====
+      // Step 2: Handle destroyed bodies
       CleanupDestroyedBodies(ref state);
     }
 
@@ -58,34 +55,6 @@ namespace ECSPhysics2D
         transform.ValueRW.Rotation = quaternion.RotateZ(body.rotation.angle);
         // Scale is preserved from original value (physics doesn't affect scale)
         transform.ValueRW.Scale = preservation.ValueRO.Scale.x;
-      }
-    }
-
-    [BurstCompile]
-    private void UpdateVelocityComponents(ref SystemState state)
-    {
-      // Update velocity components for all dynamic bodies
-      foreach (var (velocity, bodyComponent) in
-        SystemAPI.Query<RefRW<PhysicsVelocity>, RefRO<PhysicsBodyComponent>>()
-          .WithAll<PhysicsDynamicTag, PhysicsBodyInitialized>()) {
-        if (!bodyComponent.ValueRO.IsValid)
-          continue;
-
-        var body = bodyComponent.ValueRO.Body;
-        velocity.ValueRW.Linear = body.linearVelocity;
-        velocity.ValueRW.Angular = body.angularVelocity;
-      }
-
-      // Also update velocity for kinematic bodies (they might have changed)
-      foreach (var (velocity, bodyComponent) in
-        SystemAPI.Query<RefRW<PhysicsVelocity>, RefRO<PhysicsBodyComponent>>()
-          .WithAll<PhysicsKinematicTag, PhysicsBodyInitialized>()) {
-        if (!bodyComponent.ValueRO.IsValid)
-          continue;
-
-        var body = bodyComponent.ValueRO.Body;
-        velocity.ValueRW.Linear = body.linearVelocity;
-        velocity.ValueRW.Angular = body.angularVelocity;
       }
     }
 

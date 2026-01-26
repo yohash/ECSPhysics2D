@@ -43,9 +43,6 @@ namespace ECSPhysics2D
       // (Dynamic bodies are driven BY physics, so we don't sync them here)
       SyncKinematicTransforms(ref state, physicsWorld);
       SyncStaticTransforms(ref state, physicsWorld);
-
-      // ===== Step 3: Apply velocities to kinematic bodies =====
-      ApplyKinematicVelocities(ref state);
     }
 
     [BurstCompile]
@@ -65,11 +62,11 @@ namespace ECSPhysics2D
           position = transform.ValueRO.Position.xy,
           rotation = PhysicsUtility.GetRotationZ(transform.ValueRO.Rotation),
           fastCollisionsAllowed = bodyComponent.ValueRO.EnableCCD,
-          linearVelocity = float2.zero,
-          angularVelocity = 0f,
-          linearDamping = 0f,
-          angularDamping = 0f,
-          gravityScale = 1f,
+          linearVelocity = bodyComponent.ValueRO.InitialLinearVelocity,
+          angularVelocity = bodyComponent.ValueRO.InitialAngularVelocity,
+          linearDamping = bodyComponent.ValueRO.LinearDamping,
+          angularDamping = bodyComponent.ValueRO.AngularDamping,
+          gravityScale = bodyComponent.ValueRO.GravityScale,
           sleepingAllowed = true,
           awake = true,
           enabled = true
@@ -173,22 +170,6 @@ namespace ECSPhysics2D
 
         // In Phase 1, we don't move static bodies after creation
         // Phase 6 will add dirty flag optimization
-      }
-    }
-
-    [BurstCompile]
-    private void ApplyKinematicVelocities(ref SystemState state)
-    {
-      // Apply velocities to kinematic bodies if specified
-      foreach (var (velocity, bodyComponent) in
-          SystemAPI.Query<RefRO<PhysicsVelocity>, RefRO<PhysicsBodyComponent>>()
-          .WithAll<PhysicsKinematicTag, PhysicsBodyInitialized>()) {
-        if (!bodyComponent.ValueRO.IsValid)
-          continue;
-
-        var body = bodyComponent.ValueRO.Body;
-        body.linearVelocity = velocity.ValueRO.Linear;
-        body.angularVelocity = velocity.ValueRO.Angular;
       }
     }
   }

@@ -76,7 +76,8 @@ namespace ECSPhysics2D.Samples.JointBreaking
       ecb.AddComponent(entity, new PhysicsBodyComponent
       {
         Body = default,
-        WorldIndex = 0
+        WorldIndex = 0,
+        GravityScale = 1f
       });
       ecb.AddComponent<PhysicsDynamicTag>(entity);
 
@@ -98,34 +99,6 @@ namespace ECSPhysics2D.Samples.JointBreaking
 
       // Collision filter (collide with everything)
       ecb.AddComponent(entity, CollisionFilter.Create(1, 0, 1).WithCollisionEvents());
-
-      // Mass override (ensure correct mass for radius)
-      ecb.AddComponent(entity, new PhysicsMass
-      {
-        InverseMass = 1f / mass,
-        InverseInertia = 1f / (0.5f * mass * radius * radius),  // I = 0.5 * m * r²
-        CenterOfMass = float2.zero
-      });
-
-      // Velocity
-      ecb.AddComponent(entity, new PhysicsVelocity
-      {
-        Linear = float2.zero,
-        Angular = 0f
-      });
-
-      // Damping
-      ecb.AddComponent(entity, new PhysicsDamping
-      {
-        Linear = 0.01f,
-        Angular = 0.05f
-      });
-
-      // Gravity
-      ecb.AddComponent(entity, new PhysicsGravityModifier
-      {
-        Scale = 1f
-      });
 
       // Tag
       ecb.AddComponent<SpawnedCircleTag>(entity);
