@@ -50,7 +50,8 @@ namespace ECSPhysics2D.Samples.JointBreaking
       ecb.AddComponent(anchorEntity, new PhysicsBodyComponent
       {
         Body = default,
-        WorldIndex = 0
+        WorldIndex = 0,
+        GravityScale = 1f
       });
       ecb.AddComponent<PhysicsStaticTag>(anchorEntity);
 
@@ -95,7 +96,8 @@ namespace ECSPhysics2D.Samples.JointBreaking
       ecb.AddComponent(platformEntity, new PhysicsBodyComponent
       {
         Body = default,
-        WorldIndex = 0
+        WorldIndex = 0,
+        GravityScale = 1f
       });
       ecb.AddComponent<PhysicsDynamicTag>(platformEntity);
 
@@ -114,20 +116,6 @@ namespace ECSPhysics2D.Samples.JointBreaking
       });
 
       ecb.AddComponent(platformEntity, CollisionFilter.Create(1, 0, 1).WithCollisionEvents());
-
-      ecb.AddComponent(platformEntity, new PhysicsVelocity
-      {
-        Linear = float2.zero,
-        Angular = 0f
-      });
-
-      ecb.AddComponent(platformEntity, new PhysicsDamping
-      {
-        Linear = 0.1f,
-        Angular = 0.1f
-      });
-
-      ecb.AddComponent(platformEntity, new PhysicsGravityModifier { Scale = 1f });
 
       // ===== Create Hinge Joint =====
       var jointEntity = ecb.CreateEntity();

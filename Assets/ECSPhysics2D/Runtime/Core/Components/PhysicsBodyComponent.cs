@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine.LowLevelPhysics2D;
 
 namespace ECSPhysics2D
@@ -11,6 +12,18 @@ namespace ECSPhysics2D
   {
     public PhysicsBody Body;
     public int WorldIndex; // For future multi-world support
+
+    // Damping coefficients
+    public float LinearDamping;
+    public float AngularDamping;
+
+    // Initial velocities applied on body creation
+    public float2 InitialLinearVelocity;
+    public float InitialAngularVelocity;
+
+    // Multiplier for gravity effect on this body
+    public float GravityScale;
+
     // Enable Continuous Collision Detection (prevents tunneling)
     public bool EnableCCD;
 

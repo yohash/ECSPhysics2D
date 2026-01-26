@@ -63,23 +63,12 @@ namespace ECSPhysics2D.Samples.FallingCascade
       // Physics body (uninitialized)
       state.EntityManager.AddComponentData(circleEntity, new PhysicsBodyComponent
       {
-        WorldIndex = 0
+        WorldIndex = 0,
+        GravityScale = 1f
       });
 
       // Dynamic tag
       state.EntityManager.AddComponent<PhysicsDynamicTag>(circleEntity);
-
-      // Velocity
-      state.EntityManager.AddComponentData(circleEntity, PhysicsVelocity.Zero);
-
-      // Mass
-      state.EntityManager.AddComponentData(circleEntity, PhysicsMass.CreateDefault(1f));
-
-      // Damping
-      state.EntityManager.AddComponentData(circleEntity, PhysicsDamping.Default);
-
-      // Gravity
-      state.EntityManager.AddComponentData(circleEntity, PhysicsGravityScale.Default);
 
       // Circle shape
       var shape = new PhysicsShapeCircle

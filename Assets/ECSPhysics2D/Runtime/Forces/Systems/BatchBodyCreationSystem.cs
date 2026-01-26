@@ -125,12 +125,6 @@ namespace ECSPhysics2D
               quaternion.RotateZ(bodyDefinitions[i].rotation.angle)
           ));
 
-          ecb.SetComponent(bodyEntity, new PhysicsVelocity
-          {
-            Linear = bodyDefinitions[i].linearVelocity,
-            Angular = 0f
-          });
-
           ecb.SetComponent(bodyEntity, batchData.Material);
           ecb.SetComponent(bodyEntity, batchData.Filter);
 

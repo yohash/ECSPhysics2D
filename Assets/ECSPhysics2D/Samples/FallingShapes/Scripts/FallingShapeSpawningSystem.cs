@@ -47,23 +47,12 @@ namespace ECSPhysics2D.Samples.FallingShapes
         // Physics body (uninitialized - BuildPhysicsWorldSystem will create it)
         ecb.AddComponent(shapeEntity, new PhysicsBodyComponent
         {
-          WorldIndex = 0
+          WorldIndex = 0,
+          GravityScale = 1f
         });
 
         // Dynamic tag (physics drives transform)
         ecb.AddComponent<PhysicsDynamicTag>(shapeEntity);
-
-        // Velocity component
-        ecb.AddComponent(shapeEntity, PhysicsVelocity.Zero);
-
-        // Mass
-        ecb.AddComponent(shapeEntity, PhysicsMass.CreateDefault(1f));
-
-        // Damping
-        ecb.AddComponent(shapeEntity, PhysicsDamping.Default);
-
-        // Gravity
-        ecb.AddComponent(shapeEntity, PhysicsGravityScale.Default);
 
         // Material
         ecb.AddComponent(shapeEntity, new PhysicsMaterial

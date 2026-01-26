@@ -19,11 +19,10 @@ namespace ECSPhysics2D.Samples.JointBreaking
     {
       var deltaTime = SystemAPI.Time.DeltaTime;
 
-      foreach (var (motor, bodyComponent, velocity) in
+      foreach (var (motor, bodyComponent) in
           SystemAPI.Query<
               RefRO<WindmillMotor>,
-              RefRO<PhysicsBodyComponent>,
-              RefRW<PhysicsVelocity>>()) {
+              RefRO<PhysicsBodyComponent>>()) {
         if (!bodyComponent.ValueRO.IsValid)
           continue;
 
@@ -40,9 +39,6 @@ namespace ECSPhysics2D.Samples.JointBreaking
         torque = math.clamp(torque, -motor.ValueRO.MaxTorque, motor.ValueRO.MaxTorque);
 
         body.ApplyTorque(torque);
-
-        // Also directly update velocity component for consistency
-        velocity.ValueRW.Angular = currentAngularVel;
       }
     }
   }

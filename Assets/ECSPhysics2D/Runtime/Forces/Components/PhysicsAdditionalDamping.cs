@@ -2,7 +2,6 @@ using Unity.Entities;
 
 namespace ECSPhysics2D
 {
-
   /// <summary>
   /// Additional damping beyond the body's inherent damping.
   /// Good for: water zones, air resistance, slow-motion effects.

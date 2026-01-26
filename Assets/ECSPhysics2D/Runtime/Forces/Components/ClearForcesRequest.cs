@@ -6,5 +6,4 @@ namespace ECSPhysics2D
   /// Request to clear all forces on a body.
   /// </summary>
   public struct ClearForcesRequest : IComponentData { }
-
 }
