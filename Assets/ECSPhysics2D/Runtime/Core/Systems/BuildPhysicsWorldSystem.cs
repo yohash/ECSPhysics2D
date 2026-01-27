@@ -1,7 +1,6 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine.LowLevelPhysics2D;
 
@@ -10,6 +9,9 @@ namespace ECSPhysics2D
   /// <summary>
   /// Builds/Updates the physics world from ECS components.
   /// Runs before simulation to sync ECS state TO physics.
+  /// 
+  /// Supports multi-world: each body is created in the world specified by
+  /// PhysicsBodyComponent.WorldIndex.
   /// </summary>
   [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
   [UpdateBefore(typeof(PhysicsSimulationSystem))]
@@ -31,22 +33,19 @@ namespace ECSPhysics2D
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var physicsWorldSingleton))
+      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var singleton))
         return;
 
-      var physicsWorld = physicsWorldSingleton.World;
+      // Step 1: Create new physics bodies (routed to correct world by WorldIndex)
+      CreateNewPhysicsBodies(ref state, singleton);
 
-      // ===== Step 1: Create new physics bodies =====
-      CreateNewPhysicsBodies(ref state, physicsWorld);
-
-      // ===== Step 2: Sync Kinematic/Static transforms TO physics =====
-      // (Dynamic bodies are driven BY physics, so we don't sync them here)
-      SyncKinematicTransforms(ref state, physicsWorld);
-      SyncStaticTransforms(ref state, physicsWorld);
+      // Step 2: Sync Kinematic/Static transforms TO physics
+      SyncKinematicTransforms(ref state);
+      SyncStaticTransforms(ref state);
     }
 
     [BurstCompile]
-    private void CreateNewPhysicsBodies(ref SystemState state, PhysicsWorld physicsWorld)
+    private void CreateNewPhysicsBodies(ref SystemState state, PhysicsWorldSingleton singleton)
     {
       var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
@@ -56,6 +55,16 @@ namespace ECSPhysics2D
             .WithAll<PhysicsDynamicTag>()
             .WithNone<PhysicsBodyInitialized>()
             .WithEntityAccess()) {
+        var worldIndex = bodyComponent.ValueRO.WorldIndex;
+
+        if (!singleton.IsValidWorldIndex(worldIndex)) {
+          // Fall back to default world
+          worldIndex = 0;
+          bodyComponent.ValueRW.WorldIndex = 0;
+        }
+
+        var physicsWorld = singleton.GetWorld(worldIndex);
+
         var bodyDef = new PhysicsBodyDefinition
         {
           type = PhysicsBody.BodyType.Dynamic,
@@ -92,6 +101,15 @@ namespace ECSPhysics2D
           .WithAll<PhysicsKinematicTag>()
           .WithNone<PhysicsBodyInitialized>()
           .WithEntityAccess()) {
+        var worldIndex = bodyComponent.ValueRO.WorldIndex;
+
+        if (!singleton.IsValidWorldIndex(worldIndex)) {
+          worldIndex = 0;
+          bodyComponent.ValueRW.WorldIndex = 0;
+        }
+
+        var physicsWorld = singleton.GetWorld(worldIndex);
+
         var bodyDef = new PhysicsBodyDefinition
         {
           type = PhysicsBody.BodyType.Kinematic,
@@ -118,6 +136,15 @@ namespace ECSPhysics2D
           .WithAll<PhysicsStaticTag>()
           .WithNone<PhysicsBodyInitialized>()
           .WithEntityAccess()) {
+        var worldIndex = bodyComponent.ValueRO.WorldIndex;
+
+        if (!singleton.IsValidWorldIndex(worldIndex)) {
+          worldIndex = 0;
+          bodyComponent.ValueRW.WorldIndex = 0;
+        }
+
+        var physicsWorld = singleton.GetWorld(worldIndex);
+
         var bodyDef = new PhysicsBodyDefinition
         {
           type = PhysicsBody.BodyType.Static,
@@ -142,7 +169,7 @@ namespace ECSPhysics2D
     }
 
     [BurstCompile]
-    private void SyncKinematicTransforms(ref SystemState state, PhysicsWorld physicsWorld)
+    private void SyncKinematicTransforms(ref SystemState state)
     {
       // Kinematic bodies: ECS drives physics transform
       foreach (var (transform, bodyComponent) in
@@ -158,19 +185,12 @@ namespace ECSPhysics2D
     }
 
     [BurstCompile]
-    private void SyncStaticTransforms(ref SystemState state, PhysicsWorld physicsWorld)
+    private void SyncStaticTransforms(ref SystemState state)
     {
-      // Static bodies typically don't move, but support runtime repositioning
-      // Only sync if marked dirty (not implemented in Phase 1)
-      foreach (var (transform, bodyComponent) in
-          SystemAPI.Query<RefRO<LocalTransform>, RefRO<PhysicsBodyComponent>>()
-          .WithAll<PhysicsStaticTag, PhysicsBodyInitialized>()) {
-        if (!bodyComponent.ValueRO.IsValid)
-          continue;
-
-        // In Phase 1, we don't move static bodies after creation
-        // Phase 6 will add dirty flag optimization
-      }
+      // Static bodies typically don't move after creation.
+      // No sync needed - body already has correct position from creation.
+      // If runtime repositioning is needed in the future, implement explicit
+      // user-triggered sync via a request component.
     }
   }
 }

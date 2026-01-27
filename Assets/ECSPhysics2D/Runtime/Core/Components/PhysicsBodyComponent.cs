@@ -11,7 +11,9 @@ namespace ECSPhysics2D
   public struct PhysicsBodyComponent : IComponentData
   {
     public PhysicsBody Body;
-    public int WorldIndex; // For future multi-world support
+
+    // Multi-world support: index of the physics world this body belongs to
+    public int WorldIndex;
 
     // Damping coefficients
     public float LinearDamping;
