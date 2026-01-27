@@ -1,5 +1,6 @@
-﻿using Unity.Collections;
+using Unity.Collections;
 using Unity.Entities;
+using UnityEngine;
 using UnityEngine.LowLevelPhysics2D;
 
 namespace ECSPhysics2D
@@ -7,66 +8,95 @@ namespace ECSPhysics2D
   /// <summary>
   /// System that creates joints between physics bodies.
   /// Joints are separate entities that reference two body entities.
-  /// This sytem runs after shapes are created but before physics simulation.
+  /// 
+  /// Important: Both bodies connected by a joint must be in the same physics world.
+  /// The system validates WorldIndex match before creating joints.
   /// </summary>
   [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
   [UpdateAfter(typeof(ShapeCreationSystem))]
   [UpdateBefore(typeof(PhysicsSimulationSystem))]
-  //[BurstCompile]
   public partial struct JointCreationSystem : ISystem
   {
-    //[BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var physicsWorldSingleton))
+      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var singleton))
         return;
 
-      var physicsWorld = physicsWorldSingleton.World;
       var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
-      // Create Distance Joints
-      CreateDistanceJoints(ref state, physicsWorld, ecb);
-
-      // Create Revolute/Hinge Joints
-      CreateHingeJoints(ref state, physicsWorld, ecb);
-
-      // Create Prismatic/Slider Joints
-      CreateSliderJoints(ref state, physicsWorld, ecb);
-
-      // Create Wheel Joints
-      CreateWheelJoints(ref state, physicsWorld, ecb);
-
-      // Create Weld/Fixed Joints
-      CreateFixedJoints(ref state, physicsWorld, ecb);
-
-      // Create Motor/Relative Joints
-      CreateRelativeJoints(ref state, physicsWorld, ecb);
-
-      // Create Mouse Joints
-      CreateMouseJoints(ref state, physicsWorld, ecb);
+      CreateDistanceJoints(ref state, singleton, ecb);
+      CreateHingeJoints(ref state, singleton, ecb);
+      CreateSliderJoints(ref state, singleton, ecb);
+      CreateWheelJoints(ref state, singleton, ecb);
+      CreateFixedJoints(ref state, singleton, ecb);
+      CreateRelativeJoints(ref state, singleton, ecb);
+      CreateMouseJoints(ref state, singleton, ecb);
 
       ecb.Playback(state.EntityManager);
       ecb.Dispose();
     }
 
-    private void CreateDistanceJoints(ref SystemState state, PhysicsWorld physicsWorld, EntityCommandBuffer ecb)
+    /// <summary>
+    /// Validates that both bodies are in the same physics world and returns the world.
+    /// Returns false if validation fails.
+    /// </summary>
+    private bool ValidateJointBodies(
+        ref SystemState state,
+        Entity bodyEntityA,
+        Entity bodyEntityB,
+        out PhysicsBody bodyA,
+        out PhysicsBody bodyB,
+        out PhysicsWorld world)
+    {
+      bodyA = default;
+      bodyB = default;
+      world = default;
+
+      if (!SystemAPI.HasComponent<PhysicsBodyComponent>(bodyEntityA) ||
+          !SystemAPI.HasComponent<PhysicsBodyComponent>(bodyEntityB))
+        return false;
+
+      var bodyCompA = SystemAPI.GetComponent<PhysicsBodyComponent>(bodyEntityA);
+      var bodyCompB = SystemAPI.GetComponent<PhysicsBodyComponent>(bodyEntityB);
+
+      if (!bodyCompA.IsValid || !bodyCompB.IsValid)
+        return false;
+
+      // Validate both bodies are in the same world
+      if (bodyCompA.WorldIndex != bodyCompB.WorldIndex) {
+        Debug.LogError($"Joint creation failed: Bodies are in different physics worlds " +
+                       $"(BodyA: World {bodyCompA.WorldIndex}, BodyB: World {bodyCompB.WorldIndex}). " +
+                       $"Joints cannot span multiple worlds.");
+        return false;
+      }
+
+      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var singleton))
+        return false;
+
+      bodyA = bodyCompA.Body;
+      bodyB = bodyCompB.Body;
+      world = singleton.GetWorld(bodyCompA.WorldIndex);
+
+      return true;
+    }
+
+    private void CreateDistanceJoints(ref SystemState state, PhysicsWorldSingleton singleton, EntityCommandBuffer ecb)
     {
       foreach (var (jointComponent, distanceJoint, entity) in
           SystemAPI.Query<RefRW<PhysicsJointComponent>, RefRO<DistanceJoint>>()
           .WithNone<JointCreatedTag>()
           .WithEntityAccess()) {
-        // Get physics bodies from entities
-        if (!SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA) ||
-            !SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB))
+        if (!ValidateJointBodies(
+          ref state,
+          jointComponent.ValueRO.BodyA,
+          jointComponent.ValueRO.BodyB,
+          out var bodyA,
+          out var bodyB,
+          out var physicsWorld)
+        ) {
           continue;
+        }
 
-        var bodyA = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA).Body;
-        var bodyB = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB).Body;
-
-        if (!bodyA.isValid || !bodyB.isValid)
-          continue;
-
-        // Create distance joint definition
         var jointDef = new PhysicsDistanceJointDefinition
         {
           bodyA = bodyA,
@@ -91,21 +121,22 @@ namespace ECSPhysics2D
       }
     }
 
-    private void CreateHingeJoints(ref SystemState state, PhysicsWorld physicsWorld, EntityCommandBuffer ecb)
+    private void CreateHingeJoints(ref SystemState state, PhysicsWorldSingleton singleton, EntityCommandBuffer ecb)
     {
       foreach (var (jointComponent, hingeJoint, entity) in
           SystemAPI.Query<RefRW<PhysicsJointComponent>, RefRO<HingeJoint>>()
           .WithNone<JointCreatedTag>()
           .WithEntityAccess()) {
-        if (!SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA) ||
-            !SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB))
+        if (!ValidateJointBodies(
+          ref state,
+          jointComponent.ValueRO.BodyA,
+          jointComponent.ValueRO.BodyB,
+          out var bodyA,
+          out var bodyB,
+          out var physicsWorld)
+        ) {
           continue;
-
-        var bodyA = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA).Body;
-        var bodyB = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB).Body;
-
-        if (!bodyA.isValid || !bodyB.isValid)
-          continue;
+        }
 
         var jointDef = new PhysicsHingeJointDefinition
         {
@@ -133,21 +164,22 @@ namespace ECSPhysics2D
       }
     }
 
-    private void CreateSliderJoints(ref SystemState state, PhysicsWorld physicsWorld, EntityCommandBuffer ecb)
+    private void CreateSliderJoints(ref SystemState state, PhysicsWorldSingleton singleton, EntityCommandBuffer ecb)
     {
       foreach (var (jointComponent, sliderJoint, entity) in
           SystemAPI.Query<RefRW<PhysicsJointComponent>, RefRO<SliderJoint>>()
           .WithNone<JointCreatedTag>()
           .WithEntityAccess()) {
-        if (!SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA) ||
-            !SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB))
+        if (!ValidateJointBodies(
+          ref state,
+          jointComponent.ValueRO.BodyA,
+          jointComponent.ValueRO.BodyB,
+          out var bodyA,
+          out var bodyB,
+          out var physicsWorld)
+        ) {
           continue;
-
-        var bodyA = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA).Body;
-        var bodyB = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB).Body;
-
-        if (!bodyA.isValid || !bodyB.isValid)
-          continue;
+        }
 
         var jointDef = new PhysicsSliderJointDefinition
         {
@@ -155,8 +187,6 @@ namespace ECSPhysics2D
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(sliderJoint.ValueRO.LocalAnchorA),
           localAnchorB = PhysicsUtility.PhysicsTransform(sliderJoint.ValueRO.LocalAnchorB),
-          // No axis parameter available in Unity's API
-          //localAxisA = sliderJoint.ValueRO.LocalAxisA,
           springTargetTranslation = sliderJoint.ValueRO.TargetAngle,
           enableLimit = sliderJoint.ValueRO.EnableLimit,
           lowerTranslationLimit = sliderJoint.ValueRO.LowerTranslation,
@@ -177,21 +207,22 @@ namespace ECSPhysics2D
       }
     }
 
-    private void CreateWheelJoints(ref SystemState state, PhysicsWorld physicsWorld, EntityCommandBuffer ecb)
+    private void CreateWheelJoints(ref SystemState state, PhysicsWorldSingleton singleton, EntityCommandBuffer ecb)
     {
       foreach (var (jointComponent, wheelJoint, entity) in
           SystemAPI.Query<RefRW<PhysicsJointComponent>, RefRO<WheelJoint>>()
           .WithNone<JointCreatedTag>()
           .WithEntityAccess()) {
-        if (!SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA) ||
-            !SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB))
+        if (!ValidateJointBodies(
+          ref state,
+          jointComponent.ValueRO.BodyA,
+          jointComponent.ValueRO.BodyB,
+          out var bodyA,
+          out var bodyB,
+          out var physicsWorld)
+        ) {
           continue;
-
-        var bodyA = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA).Body;
-        var bodyB = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB).Body;
-
-        if (!bodyA.isValid || !bodyB.isValid)
-          continue;
+        }
 
         var jointDef = new PhysicsWheelJointDefinition
         {
@@ -199,8 +230,6 @@ namespace ECSPhysics2D
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(wheelJoint.ValueRO.LocalAnchorA),
           localAnchorB = PhysicsUtility.PhysicsTransform(wheelJoint.ValueRO.LocalAnchorB),
-          // No axis parameter available in Unity's API
-          //localAxisA = wheelJoint.ValueRO.LocalAxisA,
           enableSpring = wheelJoint.ValueRO.EnableSpring,
           springFrequency = wheelJoint.ValueRO.SpringHertz,
           springDamping = wheelJoint.ValueRO.SpringDampingRatio,
@@ -220,21 +249,22 @@ namespace ECSPhysics2D
       }
     }
 
-    private void CreateFixedJoints(ref SystemState state, PhysicsWorld physicsWorld, EntityCommandBuffer ecb)
+    private void CreateFixedJoints(ref SystemState state, PhysicsWorldSingleton singleton, EntityCommandBuffer ecb)
     {
       foreach (var (jointComponent, fixedJoint, entity) in
           SystemAPI.Query<RefRW<PhysicsJointComponent>, RefRO<WeldJoint>>()
           .WithNone<JointCreatedTag>()
           .WithEntityAccess()) {
-        if (!SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA) ||
-            !SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB))
+        if (!ValidateJointBodies(
+          ref state,
+          jointComponent.ValueRO.BodyA,
+          jointComponent.ValueRO.BodyB,
+          out var bodyA,
+          out var bodyB,
+          out var physicsWorld)
+        ) {
           continue;
-
-        var bodyA = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA).Body;
-        var bodyB = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB).Body;
-
-        if (!bodyA.isValid || !bodyB.isValid)
-          continue;
+        }
 
         var jointDef = new PhysicsFixedJointDefinition
         {
@@ -242,8 +272,6 @@ namespace ECSPhysics2D
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(fixedJoint.ValueRO.LocalAnchorA),
           localAnchorB = PhysicsUtility.PhysicsTransform(fixedJoint.ValueRO.LocalAnchorB),
-          // referenceAngle not exposed in Unity API
-          //referenceAngle = fixedJoint.ValueRO.ReferenceAngle,
           tuningFrequency = fixedJoint.ValueRO.LinearHertz,
           tuningDamping = fixedJoint.ValueRO.LinearDampingRatio,
           angularFrequency = fixedJoint.ValueRO.AngularHertz,
@@ -258,21 +286,22 @@ namespace ECSPhysics2D
       }
     }
 
-    private void CreateRelativeJoints(ref SystemState state, PhysicsWorld physicsWorld, EntityCommandBuffer ecb)
+    private void CreateRelativeJoints(ref SystemState state, PhysicsWorldSingleton singleton, EntityCommandBuffer ecb)
     {
       foreach (var (jointComponent, relativeJoint, entity) in
           SystemAPI.Query<RefRW<PhysicsJointComponent>, RefRO<RelativeJoint>>()
           .WithNone<JointCreatedTag>()
           .WithEntityAccess()) {
-        if (!SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA) ||
-            !SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB))
+        if (!ValidateJointBodies(
+          ref state,
+          jointComponent.ValueRO.BodyA,
+          jointComponent.ValueRO.BodyB,
+          out var bodyA,
+          out var bodyB,
+          out var physicsWorld)
+        ) {
           continue;
-
-        var bodyA = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyA).Body;
-        var bodyB = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB).Body;
-
-        if (!bodyA.isValid || !bodyB.isValid)
-          continue;
+        }
 
         var jointDef = new PhysicsRelativeJointDefinition
         {
@@ -280,59 +309,28 @@ namespace ECSPhysics2D
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(relativeJoint.ValueRO.LocalAnchorA),
           localAnchorB = PhysicsUtility.PhysicsTransform(relativeJoint.ValueRO.LocalAnchorB),
-          // Unity uses velocities instead of offsets
-          // compare with (https://box2d.org/documentation/group__motor__joint.html)
           linearVelocity = relativeJoint.ValueRO.LinearVelocity,
           angularVelocity = relativeJoint.ValueRO.AngularVelocity,
           maxForce = relativeJoint.ValueRO.MaxForce,
           maxTorque = relativeJoint.ValueRO.MaxTorque,
-          // Spring system (Unity addition)
           springLinearFrequency = relativeJoint.ValueRO.SpringLinearFrequency,
           springLinearDamping = relativeJoint.ValueRO.SpringLinearDamping,
           springAngularFrequency = relativeJoint.ValueRO.SpringAngularFrequency,
           springAngularDamping = relativeJoint.ValueRO.SpringAngularDamping,
           collideConnected = jointComponent.ValueRO.CollideConnected
         };
+
+        jointComponent.ValueRW.Joint = physicsWorld.CreateJoint(jointDef);
+        jointComponent.ValueRW.Joint.SetEntityUserData(entity);
+
+        ecb.AddComponent<JointCreatedTag>(entity);
       }
     }
 
-    private void CreateMouseJoints(ref SystemState state, PhysicsWorld physicsWorld, EntityCommandBuffer ecb)
+    private void CreateMouseJoints(ref SystemState state, PhysicsWorldSingleton singleton, EntityCommandBuffer ecb)
     {
       // TODO - fully implement mouse joint creation when Unity exposes MouseJointDefinition in Physics2D API
-      // OR create an equivalent joint using distance joint that follows a new target component, which is updated
-      // in a new system
-
-      //foreach (var (jointComponent, mouseJoint, entity) in
-      //    SystemAPI.Query<RefRW<PhysicsJointComponent>, RefRO<MouseJoint>>()
-      //    .WithNone<JointCreatedTag>()
-      //    .WithEntityAccess()) {
-      //  // Mouse joint only connects to one body (BodyB)
-      //  if (!SystemAPI.HasComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB))
-      //    continue;
-
-      //  var bodyB = SystemAPI.GetComponent<PhysicsBodyComponent>(jointComponent.ValueRO.BodyB).Body;
-      //  if (!bodyB.isValid)
-      //    continue;
-
-      //  // Unity has not exposed MouseJointDefinition in Physics2D API as of now
-      //  // compare with Box2D documentation: https://box2d.org/documentation/group__mouse__joint.html
-      //  //var jointDef = new PhysicsMouseJointDefinition
-      //  //{
-      //  //  bodyA = default, // Mouse joint doesn't use bodyA
-      //  //  bodyB = bodyB,
-      //  //  target = mouseJoint.ValueRO.Target,
-      //  //  localAnchor = mouseJoint.ValueRO.LocalAnchor,
-      //  //  hertz = mouseJoint.ValueRO.Hertz,
-      //  //  dampingRatio = mouseJoint.ValueRO.DampingRatio,
-      //  //  maxForce = mouseJoint.ValueRO.MaxForce
-      //  //};
-
-      //  jointComponent.ValueRW.Joint = physicsWorld.CreateJoint(jointDef);
-      //  jointComponent.ValueRW.Joint.SetEntityUserData(entity);
-
-      //  ecb.AddComponent<JointCreatedTag>(entity);
-      //  AddJointReferenceToBody(ref state, ecb, jointComponent.ValueRO.BodyB, entity, false);
-      //}
+      // OR create an equivalent joint using distance joint that follows a new target component
     }
   }
 }

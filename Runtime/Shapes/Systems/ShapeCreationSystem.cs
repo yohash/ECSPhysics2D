@@ -10,6 +10,9 @@ namespace ECSPhysics2D
   /// <summary>
   /// Creates shapes for all geometry types based on components.
   /// Handles single shapes and compound shapes.
+  /// 
+  /// Shapes are created on the body specified in PhysicsBodyComponent,
+  /// which is already associated with the correct physics world.
   /// </summary>
   [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
   [UpdateAfter(typeof(BuildPhysicsWorldSystem))]
@@ -73,6 +76,7 @@ namespace ECSPhysics2D
           radius = shape.ValueRO.Radius
         };
 
+        // Shape is created on the body, which is already in the correct world
         var physicsShape = body.ValueRO.Body.CreateShape(shapeGeometry, shapeDef);
 
         // Store rolling resistance if supported
@@ -131,17 +135,6 @@ namespace ECSPhysics2D
           }
         };
 
-        // We need a valid PolygonGeometry from the vertices of the box.
-        // Mimicking the pattern useed in 
-        // public static PolygonGeometry Create(ref ConvexHull convexHull, float radius)
-        // {
-        //   PolygonGeometry polygonGeometry = new PolygonGeometry();
-        //   polygonGeometry.vertices = convexHull.vertices;
-        //   polygonGeometry.count = convexHull.count;
-        //   polygonGeometry.radius = radius;
-        //   return polygonGeometry.Validate();
-        // }
-        // TODO - Do we need to compute a radius?
         var shapeGeometry = new PolygonGeometry
         {
           count = 4,
@@ -336,7 +329,6 @@ namespace ECSPhysics2D
           },
           triggerEvents = filter.ValueRO.GenerateTriggerEvents,
         };
-
 
         var shapeGeometry = new ChainGeometry(vertices);
 

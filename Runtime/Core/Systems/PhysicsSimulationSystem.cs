@@ -4,8 +4,13 @@ using Unity.Entities;
 namespace ECSPhysics2D
 {
   /// <summary>
-  /// Runs the Box2D physics simulation.
-  /// This is where all the physics magic happens.
+  /// Simulates all active physics worlds.
+  /// 
+  /// Each world is simulated sequentially with the same fixed timestep.
+  /// Worlds can be individually disabled via MultiWorldConfiguration.
+  /// 
+  /// Note: Future optimization could parallelize world simulation on separate threads
+  /// since worlds are independent (no cross-world interactions).
   /// </summary>
   [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
   [UpdateAfter(typeof(BuildPhysicsWorldSystem))]
@@ -16,11 +21,24 @@ namespace ECSPhysics2D
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var physicsWorldSingleton))
+      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var singleton))
         return;
 
-      // Run the Box2D simulation step
-      physicsWorldSingleton.World.Simulate(physicsWorldSingleton.FixedDeltaTime);
+      // Get per-world enabled state if configuration exists
+      var hasConfig = SystemAPI.TryGetSingleton<MultiWorldConfiguration>(out var config);
+
+      // Simulate each world
+      for (int i = 0; i < singleton.WorldCount; i++) {
+        // Check if world is enabled (default to true if no config)
+        bool enabled = !hasConfig || config.GetWorldConfig(i).Enabled;
+        if (!enabled)
+          continue;
+
+        var world = singleton.GetWorld(i);
+        if (world.isValid) {
+          world.Simulate(singleton.FixedDeltaTime);
+        }
+      }
     }
   }
 }

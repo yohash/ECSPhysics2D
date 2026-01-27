@@ -8,6 +8,8 @@ namespace ECSPhysics2D
 {
   /// <summary>
   /// System that processes shape overlap queries.
+  /// 
+  /// Each request specifies which physics world to query via WorldIndex.
   /// </summary>
   [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
   [UpdateAfter(typeof(RaycastSystem))]
@@ -18,15 +20,21 @@ namespace ECSPhysics2D
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var physicsWorldSingleton))
+      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var singleton))
         return;
 
-      var physicsWorld = physicsWorldSingleton.World;
       var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
       foreach (var (request, entity) in
           SystemAPI.Query<RefRO<OverlapShapeRequest>>()
           .WithEntityAccess()) {
+        // Get the correct physics world for this query
+        var worldIndex = request.ValueRO.WorldIndex;
+        if (!singleton.IsValidWorldIndex(worldIndex)) {
+          worldIndex = 0;
+        }
+
+        var physicsWorld = singleton.GetWorld(worldIndex);
         var overlaps = new NativeArray<PhysicsQuery.WorldOverlapResult>(16, Allocator.Temp);
 
         switch (request.ValueRO.Type) {

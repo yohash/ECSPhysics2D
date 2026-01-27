@@ -1,4 +1,3 @@
-using System;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -9,6 +8,8 @@ namespace ECSPhysics2D
 {
   /// <summary>
   /// System that processes raycast requests.
+  /// 
+  /// Each request specifies which physics world to query via WorldIndex.
   /// </summary>
   [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
   [UpdateAfter(typeof(BuildPhysicsWorldSystem))]
@@ -19,16 +20,22 @@ namespace ECSPhysics2D
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var physicsWorldSingleton))
+      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var singleton))
         return;
 
-      var physicsWorld = physicsWorldSingleton.World;
       var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
       // Process raycast requests
       foreach (var (request, entity) in
           SystemAPI.Query<RefRO<RaycastRequest>>()
           .WithEntityAccess()) {
+        // Get the correct physics world for this query
+        var worldIndex = request.ValueRO.WorldIndex;
+        if (!singleton.IsValidWorldIndex(worldIndex)) {
+          worldIndex = 0;
+        }
+
+        var physicsWorld = singleton.GetWorld(worldIndex);
 
         var input = new PhysicsQuery.CastRayInput(
           request.ValueRO.Origin,

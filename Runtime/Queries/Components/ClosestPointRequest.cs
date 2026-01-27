@@ -13,5 +13,39 @@ namespace ECSPhysics2D
     public float MaxDistance;
     public PhysicsQuery.QueryFilter Filter;
     public Entity ResultEntity;
+    public int WorldIndex;
+
+    public static ClosestPointRequest Create(
+      float2 point,
+      float maxDistance,
+      Entity resultEntity,
+      int worldIndex = 0)
+    {
+      return new ClosestPointRequest
+      {
+        Point = point,
+        MaxDistance = maxDistance,
+        Filter = PhysicsQuery.QueryFilter.defaultFilter,
+        ResultEntity = resultEntity,
+        WorldIndex = worldIndex
+      };
+    }
+
+    public static ClosestPointRequest Create(
+      float2 point,
+      float maxDistance,
+      PhysicsQuery.QueryFilter filter,
+      Entity resultEntity,
+      int worldIndex = 0)
+    {
+      return new ClosestPointRequest
+      {
+        Point = point,
+        MaxDistance = maxDistance,
+        Filter = filter,
+        ResultEntity = resultEntity,
+        WorldIndex = worldIndex
+      };
+    }
   }
 }

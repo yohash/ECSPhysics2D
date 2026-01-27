@@ -7,6 +7,8 @@ namespace ECSPhysics2D
 {
   /// <summary>
   /// Optimized explosion system using native Box2D Explode() method.
+  /// 
+  /// Each explosion specifies which physics world to affect via WorldIndex.
   /// </summary>
   [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
   [UpdateAfter(typeof(BatchForceApplicationSystem))]
@@ -17,15 +19,21 @@ namespace ECSPhysics2D
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var physicsWorldSingleton))
+      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var singleton))
         return;
 
-      var physicsWorld = physicsWorldSingleton.World;
       var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
       foreach (var (explosion, entity) in
         SystemAPI.Query<RefRO<PhysicsExplosion>>()
           .WithEntityAccess()) {
+        // Get the correct physics world for this explosion
+        var worldIndex = explosion.ValueRO.WorldIndex;
+        if (!singleton.IsValidWorldIndex(worldIndex)) {
+          worldIndex = 0; // Fall back to default world
+        }
+
+        var physicsWorld = singleton.GetWorld(worldIndex);
 
         // Use native Box2D explosion method - highly optimized
         var definition = new PhysicsWorld.ExplosionDefinition
@@ -33,12 +41,10 @@ namespace ECSPhysics2D
           position = explosion.ValueRO.Center,
           radius = explosion.ValueRO.Radius,
           hitCategories = explosion.ValueRO.AffectedLayers,
-          impulsePerLength = explosion.ValueRO.Force / explosion.ValueRO.Radius, // TODO - is this correct?
+          impulsePerLength = explosion.ValueRO.Force / explosion.ValueRO.Radius,
           falloff = explosion.ValueRO.Falloff
         };
 
-        // Note: Box2D's Explode() doesn't support custom falloff or layer filtering
-        // If we need those, we'd have to implement custom explosion logic
         physicsWorld.Explode(definition);
 
         // Destroy entity and explosion component (one-shot)

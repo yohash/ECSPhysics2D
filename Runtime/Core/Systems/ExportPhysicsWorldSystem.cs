@@ -9,6 +9,9 @@ namespace ECSPhysics2D
   /// <summary>
   /// Exports physics simulation results back to ECS components.
   /// Runs after simulation to sync physics state TO ECS.
+  /// 
+  /// Each entity's transform is read from its assigned physics world
+  /// (determined by PhysicsBodyComponent.WorldIndex).
   /// </summary>
   [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
   [UpdateAfter(typeof(PhysicsSimulationSystem))]
@@ -31,10 +34,6 @@ namespace ECSPhysics2D
     [BurstCompile]
     private void SyncDynamicTransforms(ref SystemState state)
     {
-      // Get fresh physics world reference
-      if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var worldSingleton))
-        return;
-
       // Dynamic bodies: Physics drives ECS transform
       foreach (var (transform, bodyComponent, preservation) in
           SystemAPI.Query<RefRW<LocalTransform>, RefRO<PhysicsBodyComponent>, RefRO<PhysicsTransformPreservation>>()
@@ -53,6 +52,7 @@ namespace ECSPhysics2D
 
         // Update rotation (2D rotation around Z axis)
         transform.ValueRW.Rotation = quaternion.RotateZ(body.rotation.angle);
+
         // Scale is preserved from original value (physics doesn't affect scale)
         transform.ValueRW.Scale = preservation.ValueRO.Scale.x;
       }
