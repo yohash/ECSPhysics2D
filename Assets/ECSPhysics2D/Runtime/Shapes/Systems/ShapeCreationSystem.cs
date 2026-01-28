@@ -62,12 +62,7 @@ namespace ECSPhysics2D
           density = material.ValueRO.Density,
           isTrigger = filter.ValueRO.GenerateTriggerEvents,
           contactEvents = filter.ValueRO.GenerateCollisionEvents,
-          contactFilter = new PhysicsShape.ContactFilter
-          {
-            categories = filter.ValueRO.Categories(),
-            contacts = filter.ValueRO.Mask(),
-            groupIndex = filter.ValueRO.GroupIndex
-          }
+          contactFilter = filter.ValueRO.ToContactFilter()
         };
 
         var shapeGeometry = new CircleGeometry
@@ -127,12 +122,7 @@ namespace ECSPhysics2D
           density = material.ValueRO.Density,
           isTrigger = filter.ValueRO.GenerateTriggerEvents,
           contactEvents = filter.ValueRO.GenerateCollisionEvents,
-          contactFilter = new PhysicsShape.ContactFilter
-          {
-            categories = filter.ValueRO.Categories(),
-            contacts = filter.ValueRO.Mask(),
-            groupIndex = filter.ValueRO.GroupIndex
-          }
+          contactFilter = filter.ValueRO.ToContactFilter()
         };
 
         var shapeGeometry = new PolygonGeometry
@@ -185,12 +175,7 @@ namespace ECSPhysics2D
           density = material.ValueRO.Density,
           isTrigger = filter.ValueRO.GenerateTriggerEvents,
           contactEvents = filter.ValueRO.GenerateCollisionEvents,
-          contactFilter = new PhysicsShape.ContactFilter
-          {
-            categories = filter.ValueRO.Categories(),
-            contacts = filter.ValueRO.Mask(),
-            groupIndex = filter.ValueRO.GroupIndex
-          }
+          contactFilter = filter.ValueRO.ToContactFilter()
         };
 
         var shapeGeometry = new CapsuleGeometry
@@ -255,12 +240,7 @@ namespace ECSPhysics2D
           density = material.ValueRO.Density,
           isTrigger = filter.ValueRO.GenerateTriggerEvents,
           contactEvents = filter.ValueRO.GenerateCollisionEvents,
-          contactFilter = new PhysicsShape.ContactFilter
-          {
-            categories = filter.ValueRO.Categories(),
-            contacts = filter.ValueRO.Mask(),
-            groupIndex = filter.ValueRO.GroupIndex
-          }
+          contactFilter = filter.ValueRO.ToContactFilter()
         };
 
         var shapeArray = new PhysicsShape.ShapeArray
@@ -316,12 +296,7 @@ namespace ECSPhysics2D
         var chainDef = new PhysicsChainDefinition
         {
           isLoop = shape.ValueRO.IsLoop,
-          contactFilter = new PhysicsShape.ContactFilter
-          {
-            categories = filter.ValueRO.Categories(),
-            contacts = filter.ValueRO.Mask(),
-            groupIndex = filter.ValueRO.GroupIndex
-          },
+          contactFilter = filter.ValueRO.ToContactFilter(),
           surfaceMaterial = new PhysicsShape.SurfaceMaterial
           {
             friction = material.ValueRO.Friction,
