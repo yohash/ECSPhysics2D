@@ -39,6 +39,16 @@ namespace ECSPhysics2D
     /// </summary>
     public bool GenerateTriggerEvents;
 
+    public PhysicsShape.ContactFilter ToContactFilter()
+    {
+      return new PhysicsShape.ContactFilter
+      {
+        categories = CategoryBits,
+        contacts = MaskBits,
+        groupIndex = GroupIndex
+      };
+    }
+
     public PhysicsMask Categories()
     {
       return new PhysicsMask
