@@ -29,6 +29,10 @@ namespace ECSPhysics2D
     public float SpringHertz;
     public float SpringDampingRatio;
 
+    // Event thresholds
+    public float ForceThreshold;
+    public float TorqueThreshold;
+
     public static SliderJoint CreateSlider(float2 axis, float minDist, float maxDist)
     {
       return new SliderJoint
@@ -41,7 +45,9 @@ namespace ECSPhysics2D
         LowerTranslation = minDist,
         UpperTranslation = maxDist,
         EnableMotor = false,
-        EnableSpring = false
+        EnableSpring = false,
+        ForceThreshold = float.MaxValue,
+        TorqueThreshold = float.MaxValue
       };
     }
 
@@ -59,7 +65,9 @@ namespace ECSPhysics2D
         EnableMotor = true,
         MotorSpeed = speed,
         MaxMotorForce = 1000f,
-        EnableSpring = false
+        EnableSpring = false,
+        ForceThreshold = float.MaxValue,
+        TorqueThreshold = float.MaxValue
       };
     }
   }

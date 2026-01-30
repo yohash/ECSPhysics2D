@@ -22,6 +22,9 @@ namespace ECSPhysics2D
     public float MotorSpeed;        // Target speed (m/s)
     public float MaxMotorForce;     // Maximum motor force
 
+    public float ForceThreshold;    // Joint break force threshold
+    public float TorqueThreshold;   // Joint break torque threshold
+
     public static DistanceJoint CreateRope(float length, float stretch = 0.1f)
     {
       return new DistanceJoint
@@ -33,7 +36,9 @@ namespace ECSPhysics2D
         MaxLength = length * (1f + stretch),
         SpringHertz = 0f,  // Rigid rope
         SpringDamping = 0f,
-        EnableMotor = false
+        EnableMotor = false,
+        ForceThreshold = float.MaxValue,
+        TorqueThreshold = float.MaxValue
       };
     }
 
@@ -48,7 +53,9 @@ namespace ECSPhysics2D
         MaxLength = float.MaxValue,
         SpringHertz = frequency,
         SpringDamping = damping,
-        EnableMotor = false
+        EnableMotor = false,
+        ForceThreshold = float.MaxValue,
+        TorqueThreshold = float.MaxValue
       };
     }
   }

@@ -29,6 +29,10 @@ namespace ECSPhysics2D
     public float TuningFrequency;
     public float TuningDamping;
 
+    // Event thresholds
+    public float ForceThreshold;
+    public float TorqueThreshold;
+
     public static RelativeJoint Create(float maxForce, float maxTorque, float frequency, float damping)
     {
       return new RelativeJoint
@@ -43,6 +47,8 @@ namespace ECSPhysics2D
         SpringLinearFrequency = 0f,
         TuningFrequency = frequency,
         TuningDamping = damping,
+        ForceThreshold = float.MaxValue,
+        TorqueThreshold = float.MaxValue
       };
     }
   }
