@@ -41,7 +41,9 @@ namespace ECSPhysics2D
         TargetAngle = 0f,
         EnableLimit = false,
         EnableMotor = false,
-        EnableSpring = false
+        EnableSpring = false,
+        ForceThreshold = float.MaxValue,
+        TorqueThreshold = float.MaxValue
       };
     }
 
@@ -56,7 +58,9 @@ namespace ECSPhysics2D
         EnableMotor = true,
         MotorSpeed = speed,
         MaxMotorTorque = maxTorque,
-        EnableSpring = false
+        EnableSpring = false,
+        ForceThreshold = float.MaxValue,
+        TorqueThreshold = float.MaxValue
       };
     }
 
@@ -71,7 +75,9 @@ namespace ECSPhysics2D
         LowerAngle = minAngle,
         UpperAngle = maxAngle,
         EnableMotor = false,
-        EnableSpring = false
+        EnableSpring = false,
+        ForceThreshold = float.MaxValue,
+        TorqueThreshold = float.MaxValue
       };
     }
   }

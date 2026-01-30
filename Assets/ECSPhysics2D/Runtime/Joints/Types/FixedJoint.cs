@@ -19,6 +19,10 @@ namespace ECSPhysics2D
     public float AngularHertz;      // Angular spring frequency  
     public float AngularDampingRatio;
 
+    // Event thresholds
+    public float ForceThreshold;
+    public float TorqueThreshold;
+
     public static WeldJoint CreateRigid(float2 anchorA, float2 anchorB)
     {
       return new WeldJoint
@@ -29,7 +33,9 @@ namespace ECSPhysics2D
         LinearHertz = 0f,
         LinearDampingRatio = 0f,
         AngularHertz = 0f,
-        AngularDampingRatio = 0f
+        AngularDampingRatio = 0f,
+        ForceThreshold = float.MaxValue,
+        TorqueThreshold = float.MaxValue
       };
     }
 
@@ -44,6 +50,8 @@ namespace ECSPhysics2D
         LinearDampingRatio = 0.5f,
         AngularHertz = 10f * (1f - flexibility),
         AngularDampingRatio = 0.5f
+        ForceThreshold = float.MaxValue,
+        TorqueThreshold = float.MaxValue
       };
     }
   }

@@ -111,7 +111,9 @@ namespace ECSPhysics2D
           enableMotor = distanceJoint.ValueRO.EnableMotor,
           motorSpeed = distanceJoint.ValueRO.MotorSpeed,
           maxMotorForce = distanceJoint.ValueRO.MaxMotorForce,
-          collideConnected = jointComponent.ValueRO.CollideConnected
+          collideConnected = jointComponent.ValueRO.CollideConnected,
+          forceThreshold = distanceJoint.ValueRO.ForceThreshold,
+          torqueThreshold = distanceJoint.ValueRO.TorqueThreshold
         };
 
         jointComponent.ValueRW.Joint = physicsWorld.CreateJoint(jointDef);
@@ -154,7 +156,9 @@ namespace ECSPhysics2D
           enableSpring = hingeJoint.ValueRO.EnableSpring,
           springFrequency = hingeJoint.ValueRO.SpringHertz,
           springDamping = hingeJoint.ValueRO.SpringDampingRatio,
-          collideConnected = jointComponent.ValueRO.CollideConnected
+          collideConnected = jointComponent.ValueRO.CollideConnected,
+          forceThreshold = hingeJoint.ValueRO.ForceThreshold,
+          torqueThreshold = hingeJoint.ValueRO.TorqueThreshold
         };
 
         jointComponent.ValueRW.Joint = physicsWorld.CreateJoint(jointDef);
@@ -197,7 +201,9 @@ namespace ECSPhysics2D
           enableSpring = sliderJoint.ValueRO.EnableSpring,
           springFrequency = sliderJoint.ValueRO.SpringHertz,
           springDamping = sliderJoint.ValueRO.SpringDampingRatio,
-          collideConnected = jointComponent.ValueRO.CollideConnected
+          collideConnected = jointComponent.ValueRO.CollideConnected,
+          forceThreshold = sliderJoint.ValueRO.ForceThreshold,
+          torqueThreshold = sliderJoint.ValueRO.TorqueThreshold
         };
 
         jointComponent.ValueRW.Joint = physicsWorld.CreateJoint(jointDef);
@@ -239,7 +245,9 @@ namespace ECSPhysics2D
           enableMotor = wheelJoint.ValueRO.EnableMotor,
           motorSpeed = wheelJoint.ValueRO.MotorSpeed,
           maxMotorTorque = wheelJoint.ValueRO.MaxMotorTorque,
-          collideConnected = jointComponent.ValueRO.CollideConnected
+          collideConnected = jointComponent.ValueRO.CollideConnected,
+          forceThreshold = wheelJoint.ValueRO.ForceThreshold,
+          torqueThreshold = wheelJoint.ValueRO.TorqueThreshold
         };
 
         jointComponent.ValueRW.Joint = physicsWorld.CreateJoint(jointDef);
@@ -276,7 +284,9 @@ namespace ECSPhysics2D
           tuningDamping = fixedJoint.ValueRO.LinearDampingRatio,
           angularFrequency = fixedJoint.ValueRO.AngularHertz,
           angularDamping = fixedJoint.ValueRO.AngularDampingRatio,
-          collideConnected = jointComponent.ValueRO.CollideConnected
+          collideConnected = jointComponent.ValueRO.CollideConnected,
+          forceThreshold = fixedJoint.ValueRO.ForceThreshold,
+          torqueThreshold = fixedJoint.ValueRO.TorqueThreshold
         };
 
         jointComponent.ValueRW.Joint = physicsWorld.CreateJoint(jointDef);
@@ -317,7 +327,9 @@ namespace ECSPhysics2D
           springLinearDamping = relativeJoint.ValueRO.SpringLinearDamping,
           springAngularFrequency = relativeJoint.ValueRO.SpringAngularFrequency,
           springAngularDamping = relativeJoint.ValueRO.SpringAngularDamping,
-          collideConnected = jointComponent.ValueRO.CollideConnected
+          collideConnected = jointComponent.ValueRO.CollideConnected,
+          forceThreshold = relativeJoint.ValueRO.ForceThreshold,
+          torqueThreshold = relativeJoint.ValueRO.TorqueThreshold
         };
 
         jointComponent.ValueRW.Joint = physicsWorld.CreateJoint(jointDef);

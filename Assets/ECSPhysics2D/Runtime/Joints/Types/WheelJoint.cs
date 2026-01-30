@@ -28,6 +28,10 @@ namespace ECSPhysics2D
     public float MotorSpeed;        // Wheel angular velocity
     public float MaxMotorTorque;    // Drive torque
 
+    // Event thresholds
+    public float ForceThreshold;
+    public float TorqueThreshold;
+
     public static WheelJoint CreateSuspension(float2 mount, float travel, float frequency)
     {
       return new WheelJoint
@@ -41,7 +45,9 @@ namespace ECSPhysics2D
         EnableLimit = true,
         LowerTranslation = -travel * 0.5f,
         UpperTranslation = travel * 0.5f,
-        EnableMotor = false
+        EnableMotor = false,
+        ForceThreshold = float.MaxValue,
+        TorqueThreshold = float.MaxValue
       };
     }
 
