@@ -707,21 +707,38 @@ ecb.AddComponent(jointEntity, new DistanceJoint
 
 ### Direct Body Access
 
+Box2D bodies/joints expose mutable properties. Direct assignment works. For better performance when most bodies don't change frequently, use the `ChangeFilter`:
+
 ```csharp
-var body = SystemAPI.GetComponent<PhysicsBodyComponent>(entity).Body;
+foreach (var bodyComponent in
+    SystemAPI.Query<RefRO<PhysicsBodyComponent>>()
+      .WithAll<PhysicsBodyInitialized>()
+      .WithChangeFilter<PhysicsBodyComponent>())  // Performance optimization
+{
+    if (!bodyComponent.ValueRO.IsValid)
+        continue;
 
-// Velocity
-body.linearVelocity = new float2(5f, 0f);
-body.angularVelocity = 2f;
+    var body = bodyComponent.ValueRO.Body;
 
-// Position (teleport)
-body.position = newPosition;
-body.rotation = newAngle;
+    // Direct property modification - these take effect immediately
+    body.gravityScale = 2f;
+    body.linearDamping = 0.5f;
+    body.angularDamping = 0.2f;
 
-// State
-body.enabled = false;          // Disable physics
-body.sleepingAllowed = false;
-body.Wake();                   // Force awake
+    // Velocity
+    body.linearVelocity = new float2(5f, 0f);
+    body.angularVelocity = 2f;
+
+    // Position (teleport)
+    body.position = newPosition;
+    body.rotation = newAngle;
+
+    // State
+    body.enabled = false;          // Disable physics
+    body.sleepingAllowed = false;
+    body.Wake();                   // Force awake
+}
+
 ```
 
 ### Shape Properties
