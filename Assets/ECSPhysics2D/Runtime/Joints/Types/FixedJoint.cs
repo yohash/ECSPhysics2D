@@ -49,7 +49,7 @@ namespace ECSPhysics2D
         LinearHertz = 10f * (1f - flexibility),
         LinearDampingRatio = 0.5f,
         AngularHertz = 10f * (1f - flexibility),
-        AngularDampingRatio = 0.5f
+        AngularDampingRatio = 0.5f,
         ForceThreshold = float.MaxValue,
         TorqueThreshold = float.MaxValue
       };

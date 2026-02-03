@@ -28,6 +28,9 @@ namespace ECSPhysics2D.Samples.FallingShapes
       var chainBlob = ChainBlobData.Create(vertices, Allocator.Persistent);
       vertices.Dispose();
 
+      // Register blob asset with Unity's baking system
+      AddBlobAsset(ref chainBlob, out var hash);
+
       AddComponent(entity, new PhysicsShapeChain
       {
         ChainBlob = chainBlob,

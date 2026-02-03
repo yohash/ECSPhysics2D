@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be077898983f3c4448eb2ad77a2e66d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ECSPhysics2D.Samples.FallingShapes.Runtime::ECSPhysics2D.ChainAuthoring
-  Width: 20
+  Width: 22
   SegmentCount: 20
   IsLoop: 1
   UseCurve: 1
@@ -234,7 +234,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ECSPhysics2D.Samples.FallingShapes.Runtime::ECSPhysics2D.Samples.FallingShapes.FallingShapesSampleScene
   SpawnHeight: 10
-  SpawnAreaRadius: 5
+  SpawnAreaRadius: 10
   MinSize: 0.3
   MaxSize: 1.2
   SpawnCooldown: 0.1
