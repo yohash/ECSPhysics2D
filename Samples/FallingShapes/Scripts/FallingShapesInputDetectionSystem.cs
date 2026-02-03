@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -6,7 +7,7 @@ using UnityEngine.InputSystem;
 namespace ECSPhysics2D.Samples.FallingShapes
 {
   /// <summary>
-  /// Detects input and creates spawn requests.
+  /// Processes UserShapeCreationRequest components, applies throttling via config, and creates SpawnShapeRequest.
   /// Runs before FixedStep so requests are ready for spawning system.
   /// </summary>
   [UpdateInGroup(typeof(SimulationSystemGroup))]
@@ -28,12 +29,18 @@ namespace ECSPhysics2D.Samples.FallingShapes
 
       var deltaTime = SystemAPI.Time.DeltaTime;
 
-      bool shouldSpawnContinuous = false;
-      bool shouldExplodeMouse = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
-      float2 mousePos = float2.zero;
+      var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
-      // Update config state BEFORE any structural changes
-      if (Keyboard.current != null && Keyboard.current.spaceKey.isPressed) {
+      // Check if any UserShapeCreationRequest exists
+      bool hasUserRequest = false;
+      foreach (var (_, entity) in SystemAPI.Query<RefRO<UserShapeCreationRequest>>().WithEntityAccess()) {
+        hasUserRequest = true;
+        ecb.DestroyEntity(entity);
+      }
+
+      bool shouldSpawnContinuous = false;
+
+      if (hasUserRequest) {
         config.ValueRW.TimeSinceLastSpawn += deltaTime;
 
         if (config.ValueRW.TimeSinceLastSpawn >= config.ValueRO.SpawnCooldown) {
@@ -44,23 +51,26 @@ namespace ECSPhysics2D.Samples.FallingShapes
         config.ValueRW.TimeSinceLastSpawn = 0f;
       }
 
-      // Capture config values before structural changes
       var spawnConfig = config.ValueRO;
 
-      // Now do structural changes (entity creation)
       if (shouldSpawnContinuous) {
         SpawnRandomShape(ref state, spawnConfig);
       }
 
+      bool shouldExplodeMouse = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+      shouldExplodeMouse &= !MouseOverDetector.IsMouseOverUI;
+
       if (shouldExplodeMouse) {
-        mousePos = GetMouseWorldPosition();
+        var mousePos = GetMouseWorldPosition();
         CreateExplosion(ref state, mousePos);
       }
+
+      ecb.Playback(state.EntityManager);
+      ecb.Dispose();
     }
 
     private void SpawnRandomShape(ref SystemState state, FallingShapesSampleConfig config)
     {
-      // Random position within spawn area
       var angle = random.NextFloat(0f, math.PI * 2f);
       var radius = random.NextFloat(0f, config.SpawnAreaRadius);
       var position = new float2(
@@ -74,12 +84,8 @@ namespace ECSPhysics2D.Samples.FallingShapes
     private void SpawnShapeAtPosition(ref SystemState state, float2 position, FallingShapesSampleConfig config)
     {
       var requestEntity = state.EntityManager.CreateEntity();
-
-      // Random size
       var size = random.NextFloat(config.MinSize, config.MaxSize);
-
-      state.EntityManager.AddComponentData(requestEntity,
-          SpawnShapeRequest.CreateRandom(position, size));
+      state.EntityManager.AddComponentData(requestEntity, SpawnShapeRequest.CreateRandom(position, size));
     }
 
     private void CreateExplosion(ref SystemState state, float2 position)
@@ -100,9 +106,7 @@ namespace ECSPhysics2D.Samples.FallingShapes
     {
       var camera = Camera.main;
       if (camera == null) {
-        if (camera == null) {
-          camera = Object.FindFirstObjectByType<Camera>();
-        }
+        camera = Object.FindFirstObjectByType<Camera>();
         if (camera == null) {
           return float2.zero;
         }
