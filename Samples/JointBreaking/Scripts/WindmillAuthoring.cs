@@ -15,7 +15,7 @@ namespace ECSPhysics2D.Samples.JointBreaking
     public float SpokeWidth = 0.4f;
 
     [Header("Motor Properties")]
-    public float RotationSpeed = 3f;  // rad/s
+    public float RotationSpeed = 3f;  // deg/s
     public float MaxTorque = 250f;
 
     [Header("Spoke Damage")]
