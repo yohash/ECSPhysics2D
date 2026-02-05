@@ -443,7 +443,7 @@ MonoBehaviour:
   SpokeWidth: 0.5
   RotationSpeed: -120
   MaxTorque: 80
-  SpokeBreakThreshold: 20000
+  SpokeBreakThreshold: 14000
   Friction: 0.4
   Bounciness: 0.2
   Density: 2

@@ -1,18 +1,18 @@
 {
   "name": "com.ecsphysics2d.core",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "displayName": "ECSPhysics2D",
-  "description": "This is an ECS-compatible wrapper for the UnityEngine.LowLevelPhysics2D Physics engine. The physics engine is struct-based, multithreaded, high performance, and out of the box DOTS compatible.",
+  "description": "ECSPhysics2D is an ECS-compatible wrapper for the UnityEngine.LowLevelPhysics2D Physics engine. The physics engine is struct-based, multithreaded, high performance, and out of the box DOTS compatible.",
   "unity": "6000.3",
-  "unityRelease": "0b9",
+  "unityRelease": "0f1",
   "documentationUrl": "https://github.com/yohash/ECSPhysics2D/blob/main/README.md",
   "changelogUrl": "https://github.com/yohash/ECSPhysics2D/blob/main/Assets/ECSPhysics2D/CHANGELOG.md",
   "licensesUrl": "https://github.com/yohash/ECSPhysics2D/blob/main/Assets/ECSPhysics2D/LICENSE.md",
   "dependencies": { 
-    "com.unity.entities": "1.4.2",
-    "com.unity.burst": "1.8.24",
-    "com.unity.collections": "2.6.2",
-    "com.unity.mathematics": "1.3.2"
+    "com.unity.entities": "1.4.4",
+    "com.unity.burst": "1.8.27",
+    "com.unity.collections": "2.6.4",
+    "com.unity.mathematics": "1.3.3"
   },
   "keywords": [
     "ecs",
@@ -21,19 +21,24 @@
   ],
   "samples": [
     {
-      "displayName": "Addressable Mounters",
-      "description": "A collection of `Element` mounting functions working with Unity's Addressable Assets.",
-      "path": "Samples~/AddressableMounters"
+      "displayName": "Falling Shapes",
+      "description": "Demonstrates shape creation and explosions.",
+      "path": "Samples~/FallingShapes"
     },
     {
-      "displayName": "Simple Setup",
-      "description": "A simple UI with state and actions to demonstrates the core patterns of ECS-React.",
-      "path": "Samples~/SimpleSetup"
+      "displayName": "Falling Cascade",
+      "description": "Demonstrates collision event detection and collision layers.",
+      "path": "Samples~/FallingCascade"
     },
     {
-      "displayName": "Battle System Demo",
-      "description": "A basic RPG-like battle system to demonstrates more advanced patterns of ECS-React.",
-      "path": "Samples~/BattleSystemDemo"
+      "displayName": "Joints Breaking",
+      "description": "Demonstrates hinge joints with springs, hinge joints with motors, weld joints, and joint collision.",
+      "path": "Samples~/JointBreaking"
+    },
+    {
+      "displayName": "Multiple Physics Worlds",
+      "description": "Demonstrates two physics worlds with no interactions.",
+      "path": "Samples~/MultiWorldDemo"
     }
   ],
   "author": {

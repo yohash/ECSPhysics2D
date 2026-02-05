@@ -2,7 +2,7 @@ This tool is licensed under the MIT license (https://opensource.org/licenses/MIT
 
 MIT License
 
-Copyright (c) 2025 Jason Heebl
+Copyright (c) 2026 Jason Heebl
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
