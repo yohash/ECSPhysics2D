@@ -154,7 +154,9 @@ namespace ECSPhysics2D.Samples.JointBreaking
         EnableMotor = false,
         EnableSpring = true,
         SpringHertz = config.SpringFrequency,
-        SpringDampingRatio = config.SpringDamping
+        SpringDampingRatio = config.SpringDamping,
+        ForceThreshold = 1000,
+        TorqueThreshold = 100
       });
 
       ecb.AddComponent(jointEntity, JointDamage.Create(config.BreakThreshold));
