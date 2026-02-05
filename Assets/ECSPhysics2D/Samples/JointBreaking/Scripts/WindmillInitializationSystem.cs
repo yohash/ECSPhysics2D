@@ -105,9 +105,6 @@ namespace ECSPhysics2D.Samples.JointBreaking
 
       ecb.AddComponent(centralEntity, CollisionFilter.Create(1, 0, 1).WithCollisionEvents());
 
-      // WindmillMotor component for velocity control
-      ecb.AddComponent(centralEntity, WindmillMotor.Create(config.RotationSpeed, config.MaxTorque));
-
       // ===== Create Motor Joint (Hinge with motor) =====
       var motorJointEntity = ecb.CreateEntity();
 
@@ -129,7 +126,9 @@ namespace ECSPhysics2D.Samples.JointBreaking
         EnableMotor = true,
         MotorSpeed = config.RotationSpeed,
         MaxMotorTorque = config.MaxTorque,
-        EnableSpring = false
+        EnableSpring = false,
+        ForceThreshold = 100,
+        TorqueThreshold = 10
       });
 
       // ===== Create 4 Spokes with Weld Joints =====
@@ -201,7 +200,9 @@ namespace ECSPhysics2D.Samples.JointBreaking
           LinearHertz = 0f, // Rigid (no spring)
           LinearDampingRatio = 1f,
           AngularHertz = 0,
-          AngularDampingRatio = 1f
+          AngularDampingRatio = 1f,
+          ForceThreshold = 100,
+          TorqueThreshold = 10
         });
 
         ecb.AddComponent(weldJointEntity, JointDamage.Create(config.SpokeBreakThreshold));

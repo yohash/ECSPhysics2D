@@ -22,8 +22,8 @@ namespace ECSPhysics2D
     public float MotorSpeed;        // Target speed (m/s)
     public float MaxMotorForce;     // Maximum motor force
 
-    public float ForceThreshold;    // Joint break force threshold
-    public float TorqueThreshold;   // Joint break torque threshold
+    public float ForceThreshold;    // Joint event generation force threshold
+    public float TorqueThreshold;   // Joint event generation threshold
 
     public static DistanceJoint CreateRope(float length, float stretch = 0.1f)
     {

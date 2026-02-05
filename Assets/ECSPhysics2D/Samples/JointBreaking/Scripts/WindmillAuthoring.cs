@@ -1,5 +1,4 @@
 using Unity.Entities;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace ECSPhysics2D.Samples.JointBreaking

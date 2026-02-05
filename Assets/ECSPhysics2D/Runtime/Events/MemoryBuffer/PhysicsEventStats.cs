@@ -35,5 +35,12 @@ namespace ECSPhysics2D
     /// </summary>
     public bool AnyOverflowUsed =>
       CollisionOverflowUsed || TriggerOverflowUsed || SleepOverflowUsed || JointThresholdOverflowUsed;
+
+    public string Report()
+    {
+      return $"Events: {TotalEventCount} (Collisions: {CollisionEventCount}, Triggers: {TriggerEventCount}, Sleep: {SleepEventCount}, JointThreshold: {JointThresholdEventCount})\n" +
+             $"Overflow Used: {(AnyOverflowUsed ? "Yes" : "No")}\n" +
+             $"Peak Counts: (Collisions: {PeakCollisionCount}, Triggers: {PeakTriggerCount}, Sleep: {PeakSleepCount}, JointThreshold: {PeakJointThresholdCount})";
+    }
   }
 }

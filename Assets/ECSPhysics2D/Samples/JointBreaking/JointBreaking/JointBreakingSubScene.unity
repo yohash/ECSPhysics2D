@@ -441,7 +441,7 @@ MonoBehaviour:
   CentralRadius: 1.5
   SpokeLength: 3
   SpokeWidth: 0.5
-  RotationSpeed: -60
+  RotationSpeed: -120
   MaxTorque: 80
   SpokeBreakThreshold: 20000
   Friction: 0.4
