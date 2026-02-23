@@ -1,6 +1,8 @@
 # ECSPhysics2D
 
-**An ECS-compatible wrapper for the UnityEngine.LowLevelPhysics2D Physics engine. The physics engine is struct-based, multithreaded, high performance, and out of the box DOTS compatible.
+**An ECS-compatible wrapper for the UnityEngine.LowLevelPhysics2D Physics engine.**
+
+The physics engine is struct-based, multithreaded, high performance, and out of the box DOTS compatible.
 
 ## Get ECS-React
 
