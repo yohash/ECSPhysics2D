@@ -20,7 +20,7 @@ namespace ECSPhysics2D.Samples.FallingCascade
       state.RequireForUpdate<PhysicsEventsSingleton>();
     }
 
-    //[BurstCompile]
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
       if (!SystemAPI.TryGetSingleton<PhysicsEventsSingleton>(out var eventsSingleton))
