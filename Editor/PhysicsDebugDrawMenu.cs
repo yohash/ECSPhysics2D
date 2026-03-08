@@ -36,17 +36,12 @@ namespace ECSPhysics2D.Editor
       if (!em.HasSingleton<PhysicsWorldSingleton>()) return;
 
       var singleton = em.GetSingleton<PhysicsWorldSingleton>();
+      var options = enabled ? PhysicsWorld.DrawOptions.All : PhysicsWorld.DrawOptions.None;
+
       for (int i = 0; i < singleton.WorldCount; i++) {
         var world = singleton.GetWorld(i);
         if (!world.isValid) continue;
-
-        var dd = world.debugDraw;
-        dd.drawShapes   = enabled;
-        dd.drawJoints   = enabled;
-        dd.drawAABBs    = enabled;
-        dd.drawContacts = enabled;
-        dd.drawMass     = enabled;
-        world.debugDraw = dd;
+        world.drawOptions = options;
       }
     }
   }
