@@ -5,17 +5,30 @@ using Unity.Entities;
 
 namespace ECSPhysics2D.Editor
 {
+  /// <summary>
+  /// Adds "ECS Physics 2D > Debug Draw Enabled" to the Unity top-bar menu.
+  ///
+  /// The static PhysicsDebugDraw.Enabled (Runtime assembly) is the single source
+  /// of truth at runtime. EditorPrefs persists the preference across sessions.
+  /// [InitializeOnLoad] restores PhysicsDebugDraw.Enabled from EditorPrefs after
+  /// every domain reload so worlds created on play-mode entry inherit the setting.
+  /// </summary>
+  [InitializeOnLoad]
   public static class PhysicsDebugDrawMenu
   {
     private const string PrefKey = "ECSPhysics2D.DebugDrawEnabled";
     private const string MenuPath = "ECS Physics 2D/Debug Draw Enabled";
 
-    private static bool IsEnabled => EditorPrefs.GetBool(PrefKey, false);
+    static PhysicsDebugDrawMenu()
+    {
+      PhysicsDebugDraw.Enabled = EditorPrefs.GetBool(PrefKey, false);
+    }
 
     [MenuItem(MenuPath)]
     private static void Toggle()
     {
-      bool next = !IsEnabled;
+      bool next = !PhysicsDebugDraw.Enabled;
+      PhysicsDebugDraw.Enabled = next;
       EditorPrefs.SetBool(PrefKey, next);
       ApplyToWorlds(next);
     }
@@ -23,12 +36,14 @@ namespace ECSPhysics2D.Editor
     [MenuItem(MenuPath, validate = true)]
     private static bool ToggleValidate()
     {
-      Menu.SetChecked(MenuPath, IsEnabled);
-      return Application.isPlaying;
+      Menu.SetChecked(MenuPath, PhysicsDebugDraw.Enabled);
+      return true;
     }
 
     private static void ApplyToWorlds(bool enabled)
     {
+      if (!Application.isPlaying) return;
+
       var defaultWorld = World.DefaultGameObjectInjectionWorld;
       if (defaultWorld == null || !defaultWorld.IsCreated) return;
 
