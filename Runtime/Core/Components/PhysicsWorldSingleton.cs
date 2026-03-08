@@ -142,7 +142,9 @@ namespace ECSPhysics2D
 
     private static PhysicsWorld CreateWorld(PhysicsWorldDefinition worldDef)
     {
-      worldDef.drawOptions = PhysicsWorld.DrawOptions.DefaultAll;
+      worldDef.drawOptions = PhysicsDebugDraw.Enabled
+        ? PhysicsWorld.DrawOptions.DefaultAll
+        : PhysicsWorld.DrawOptions.Off;
       return PhysicsWorld.Create(worldDef);
     }
 
