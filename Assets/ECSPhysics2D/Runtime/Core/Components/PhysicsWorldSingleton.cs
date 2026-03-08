@@ -146,15 +146,8 @@ namespace ECSPhysics2D
 
     private static PhysicsWorld CreateWorld(PhysicsWorldDefinition worldDef)
     {
-      var world = PhysicsWorld.Create(worldDef);
-      var dd = world.debugDraw;
-      dd.drawShapes   = false;
-      dd.drawJoints   = false;
-      dd.drawAABBs    = false;
-      dd.drawContacts = false;
-      dd.drawMass     = false;
-      world.debugDraw = dd;
-      return world;
+      worldDef.drawOptions = PhysicsWorld.DrawOptions.None;
+      return PhysicsWorld.Create(worldDef);
     }
 
     /// <summary>
