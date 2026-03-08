@@ -7,7 +7,7 @@ namespace ECSPhysics2D.Editor
 {
   public static class PhysicsDebugDrawMenu
   {
-    private const string PrefKey  = "ECSPhysics2D.DebugDrawEnabled";
+    private const string PrefKey = "ECSPhysics2D.DebugDrawEnabled";
     private const string MenuPath = "ECS Physics 2D/Debug Draw Enabled";
 
     private static bool IsEnabled => EditorPrefs.GetBool(PrefKey, false);
@@ -33,10 +33,15 @@ namespace ECSPhysics2D.Editor
       if (defaultWorld == null || !defaultWorld.IsCreated) return;
 
       var em = defaultWorld.EntityManager;
-      if (!em.HasSingleton<PhysicsWorldSingleton>()) return;
+      var query = em.CreateEntityQuery(typeof(PhysicsWorldSingleton));
 
-      var singleton = em.GetSingleton<PhysicsWorldSingleton>();
-      var options = enabled ? PhysicsWorld.DrawOptions.All : PhysicsWorld.DrawOptions.None;
+      if (!query.TryGetSingletonEntity<PhysicsWorldSingleton>(out Entity entity)) {
+        return;
+      }
+
+      var singleton = em.GetComponentData<PhysicsWorldSingleton>(entity);
+
+      var options = enabled ? PhysicsWorld.DrawOptions.DefaultAll : PhysicsWorld.DrawOptions.Off;
 
       for (int i = 0; i < singleton.WorldCount; i++) {
         var world = singleton.GetWorld(i);

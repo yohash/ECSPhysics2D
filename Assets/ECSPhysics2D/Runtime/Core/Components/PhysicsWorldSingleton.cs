@@ -45,8 +45,7 @@ namespace ECSPhysics2D
     /// </summary>
     public PhysicsWorld GetWorld(int index)
     {
-      return index switch
-      {
+      return index switch {
         0 => World0,
         1 => World1,
         2 => World2,
@@ -105,8 +104,7 @@ namespace ECSPhysics2D
     /// </summary>
     public static PhysicsWorldSingleton CreateDefault()
     {
-      var worldDef = new PhysicsWorldDefinition
-      {
+      var worldDef = new PhysicsWorldDefinition {
         gravity = new float2(0f, -9.81f),
         transformPlane = PhysicsWorld.TransformPlane.XY,
         simulateType = PhysicsWorld.SimulationType.Script,
@@ -116,8 +114,7 @@ namespace ECSPhysics2D
         contactHitEventThreshold = 0.01f,
       };
 
-      return new PhysicsWorldSingleton
-      {
+      return new PhysicsWorldSingleton {
         World0 = CreateWorld(worldDef),
         WorldCount = 1,
         FixedDeltaTime = 1f / 60f
@@ -129,8 +126,7 @@ namespace ECSPhysics2D
     /// </summary>
     public static PhysicsWorldSingleton Create(MultiWorldConfiguration config)
     {
-      var singleton = new PhysicsWorldSingleton
-      {
+      var singleton = new PhysicsWorldSingleton {
         WorldCount = config.WorldCount,
         FixedDeltaTime = config.FixedDeltaTime
       };
@@ -146,7 +142,7 @@ namespace ECSPhysics2D
 
     private static PhysicsWorld CreateWorld(PhysicsWorldDefinition worldDef)
     {
-      worldDef.drawOptions = PhysicsWorld.DrawOptions.None;
+      worldDef.drawOptions = PhysicsWorld.DrawOptions.DefaultAll;
       return PhysicsWorld.Create(worldDef);
     }
 
