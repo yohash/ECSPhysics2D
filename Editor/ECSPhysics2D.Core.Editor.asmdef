@@ -1,0 +1,16 @@
+{
+    "name": "ECSPhysics2D.Core.Editor",
+    "rootNamespace": "",
+    "references": [
+        "ECSPhysics2D.Core.Runtime"
+    ],
+    "includePlatforms": ["Editor"],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

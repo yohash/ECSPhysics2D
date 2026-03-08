@@ -118,7 +118,7 @@ namespace ECSPhysics2D
 
       return new PhysicsWorldSingleton
       {
-        World0 = PhysicsWorld.Create(worldDef),
+        World0 = CreateWorld(worldDef),
         WorldCount = 1,
         FixedDeltaTime = 1f / 60f
       };
@@ -138,10 +138,23 @@ namespace ECSPhysics2D
       for (int i = 0; i < config.WorldCount; i++) {
         var worldConfig = config.GetWorldConfig(i);
         var worldDef = worldConfig.ToDefinition();
-        singleton.SetWorld(i, PhysicsWorld.Create(worldDef));
+        singleton.SetWorld(i, CreateWorld(worldDef));
       }
 
       return singleton;
+    }
+
+    private static PhysicsWorld CreateWorld(PhysicsWorldDefinition worldDef)
+    {
+      var world = PhysicsWorld.Create(worldDef);
+      var dd = world.debugDraw;
+      dd.drawShapes   = false;
+      dd.drawJoints   = false;
+      dd.drawAABBs    = false;
+      dd.drawContacts = false;
+      dd.drawMass     = false;
+      world.debugDraw = dd;
+      return world;
     }
 
     /// <summary>
