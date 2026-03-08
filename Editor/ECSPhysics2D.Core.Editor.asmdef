@@ -2,9 +2,13 @@
     "name": "ECSPhysics2D.Core.Editor",
     "rootNamespace": "",
     "references": [
-        "ECSPhysics2D.Core.Runtime"
+        "ECSPhysics2D.Core.Runtime",
+        "Unity.Entities",
+        "Unity.Collections"
     ],
-    "includePlatforms": ["Editor"],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
