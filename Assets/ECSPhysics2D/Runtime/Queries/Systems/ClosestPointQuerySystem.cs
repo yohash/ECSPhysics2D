@@ -68,8 +68,9 @@ namespace ECSPhysics2D
           }
         }
 
-        // Store result
-        if (request.ValueRO.ResultEntity != Entity.Null && found) {
+        // Store result — always write, even when not found, so consumers
+        // don't read stale data from a previous frame's query.
+        if (request.ValueRO.ResultEntity != Entity.Null) {
           ecb.SetComponent(request.ValueRO.ResultEntity, result);
         }
 
