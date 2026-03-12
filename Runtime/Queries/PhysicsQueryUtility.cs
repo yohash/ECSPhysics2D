@@ -169,7 +169,7 @@ namespace ECSPhysics2D
         PhysicsWorld world,
         float2 center,
         float radius,
-        ref NativeList<PhysicsBody> results,
+        ref NativeList<Entity> results,
         PhysicsQuery.QueryFilter filter = default)
     {
       var geometry = new CircleGeometry
@@ -183,7 +183,8 @@ namespace ECSPhysics2D
 
       results.Clear();
       for (int i = 0; i < overlaps.Length; i++) {
-        results.Add(overlaps[i].shape.body);
+        var entity = overlaps[i].shape.body.GetEntityUserData();
+        results.Add(entity);
       }
 
       int count = overlaps.Length;
