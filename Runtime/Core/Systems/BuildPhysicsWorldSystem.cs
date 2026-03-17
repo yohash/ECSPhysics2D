@@ -70,7 +70,7 @@ namespace ECSPhysics2D
         {
           type = PhysicsBody.BodyType.Dynamic,
           position = localToWorld.ValueRO.Position.xy,
-          rotation = PhysicsUtility.GetRotationZ(math.rotation(localToWorld.ValueRO.Value)),
+          rotation = PhysicsUtility.GetRotationZ(new quaternion(localToWorld.ValueRO.Value)),
           fastCollisionsAllowed = bodyComponent.ValueRO.EnableCCD,
           linearVelocity = bodyComponent.ValueRO.InitialLinearVelocity,
           angularVelocity = bodyComponent.ValueRO.InitialAngularVelocity,
@@ -115,7 +115,7 @@ namespace ECSPhysics2D
         {
           type = PhysicsBody.BodyType.Kinematic,
           position = localToWorld.ValueRO.Position.xy,
-          rotation = PhysicsUtility.GetRotationZ(math.rotation(localToWorld.ValueRO.Value)),
+          rotation = PhysicsUtility.GetRotationZ(new quaternion(localToWorld.ValueRO.Value)),
           fastCollisionsAllowed = bodyComponent.ValueRO.EnableCCD,
           enabled = true
         };
@@ -150,7 +150,7 @@ namespace ECSPhysics2D
         {
           type = PhysicsBody.BodyType.Static,
           position = localToWorld.ValueRO.Position.xy,
-          rotation = PhysicsUtility.GetRotationZ(math.rotation(localToWorld.ValueRO.Value)),
+          rotation = PhysicsUtility.GetRotationZ(new quaternion(localToWorld.ValueRO.Value)),
           enabled = true
         };
 
@@ -181,7 +181,7 @@ namespace ECSPhysics2D
 
         var body = bodyComponent.ValueRO.Body;
         body.position = localToWorld.ValueRO.Position.xy;
-        body.rotation = PhysicsUtility.GetRotationZ(math.rotation(localToWorld.ValueRO.Value));
+        body.rotation = PhysicsUtility.GetRotationZ(new quaternion(localToWorld.ValueRO.Value));
       }
     }
 
