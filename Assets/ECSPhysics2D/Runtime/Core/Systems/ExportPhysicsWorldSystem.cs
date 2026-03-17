@@ -68,7 +68,7 @@ namespace ECSPhysics2D
           var parentLTW = _localToWorldLookup[parent.Value];
           var invParent = math.inverse(parentLTW.Value);
           transform.ValueRW.Position = math.transform(invParent, worldPos);
-          transform.ValueRW.Rotation = math.mul(math.inverse(math.rotation(parentLTW.Value)), worldRot);
+          transform.ValueRW.Rotation = math.mul(math.inverse(new quaternion(parentLTW.Value)), worldRot);
         } else {
           // Root entity: local space == world space
           transform.ValueRW.Position = worldPos;
