@@ -1,6 +1,7 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine.LowLevelPhysics2D;
 
@@ -9,7 +10,7 @@ namespace ECSPhysics2D
   /// <summary>
   /// Builds/Updates the physics world from ECS components.
   /// Runs before simulation to sync ECS state TO physics.
-  /// 
+  ///
   /// Supports multi-world: each body is created in the world specified by
   /// PhysicsBodyComponent.WorldIndex.
   /// </summary>
@@ -50,8 +51,8 @@ namespace ECSPhysics2D
       var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
       // Create Dynamic bodies
-      foreach (var (transform, bodyComponent, entity) in
-          SystemAPI.Query<RefRO<LocalTransform>, RefRW<PhysicsBodyComponent>>()
+      foreach (var (localToWorld, transform, bodyComponent, entity) in
+          SystemAPI.Query<RefRO<LocalToWorld>, RefRO<LocalTransform>, RefRW<PhysicsBodyComponent>>()
             .WithAll<PhysicsDynamicTag>()
             .WithNone<PhysicsBodyInitialized>()
             .WithEntityAccess()) {
@@ -68,8 +69,8 @@ namespace ECSPhysics2D
         var bodyDef = new PhysicsBodyDefinition
         {
           type = PhysicsBody.BodyType.Dynamic,
-          position = transform.ValueRO.Position.xy,
-          rotation = PhysicsUtility.GetRotationZ(transform.ValueRO.Rotation),
+          position = localToWorld.ValueRO.Position.xy,
+          rotation = PhysicsUtility.GetRotationZ(math.rotation(localToWorld.ValueRO.Value)),
           fastCollisionsAllowed = bodyComponent.ValueRO.EnableCCD,
           linearVelocity = bodyComponent.ValueRO.InitialLinearVelocity,
           angularVelocity = bodyComponent.ValueRO.InitialAngularVelocity,
@@ -86,18 +87,18 @@ namespace ECSPhysics2D
         // Store entity reference in userData for callbacks
         bodyComponent.ValueRW.Body.SetEntityUserData(entity);
 
-        // Mark as initialized and preserve Z position
+        // Mark as initialized and preserve world-space Z position and scale
         ecb.AddComponent<PhysicsBodyInitialized>(entity);
         ecb.AddComponent(entity, new PhysicsTransformPreservation
         {
-          ZPosition = transform.ValueRO.Position.z,
+          ZPosition = localToWorld.ValueRO.Position.z,
           Scale = transform.ValueRO.Scale
         });
       }
 
       // Create Kinematic bodies
-      foreach (var (transform, bodyComponent, entity) in
-          SystemAPI.Query<RefRO<LocalTransform>, RefRW<PhysicsBodyComponent>>()
+      foreach (var (localToWorld, transform, bodyComponent, entity) in
+          SystemAPI.Query<RefRO<LocalToWorld>, RefRO<LocalTransform>, RefRW<PhysicsBodyComponent>>()
           .WithAll<PhysicsKinematicTag>()
           .WithNone<PhysicsBodyInitialized>()
           .WithEntityAccess()) {
@@ -113,8 +114,8 @@ namespace ECSPhysics2D
         var bodyDef = new PhysicsBodyDefinition
         {
           type = PhysicsBody.BodyType.Kinematic,
-          position = transform.ValueRO.Position.xy,
-          rotation = PhysicsUtility.GetRotationZ(transform.ValueRO.Rotation),
+          position = localToWorld.ValueRO.Position.xy,
+          rotation = PhysicsUtility.GetRotationZ(math.rotation(localToWorld.ValueRO.Value)),
           fastCollisionsAllowed = bodyComponent.ValueRO.EnableCCD,
           enabled = true
         };
@@ -125,14 +126,14 @@ namespace ECSPhysics2D
         ecb.AddComponent<PhysicsBodyInitialized>(entity);
         ecb.AddComponent(entity, new PhysicsTransformPreservation
         {
-          ZPosition = transform.ValueRO.Position.z,
+          ZPosition = localToWorld.ValueRO.Position.z,
           Scale = transform.ValueRO.Scale
         });
       }
 
       // Create Static bodies
-      foreach (var (transform, bodyComponent, entity) in
-          SystemAPI.Query<RefRO<LocalTransform>, RefRW<PhysicsBodyComponent>>()
+      foreach (var (localToWorld, transform, bodyComponent, entity) in
+          SystemAPI.Query<RefRO<LocalToWorld>, RefRO<LocalTransform>, RefRW<PhysicsBodyComponent>>()
           .WithAll<PhysicsStaticTag>()
           .WithNone<PhysicsBodyInitialized>()
           .WithEntityAccess()) {
@@ -148,8 +149,8 @@ namespace ECSPhysics2D
         var bodyDef = new PhysicsBodyDefinition
         {
           type = PhysicsBody.BodyType.Static,
-          position = transform.ValueRO.Position.xy,
-          rotation = PhysicsUtility.GetRotationZ(transform.ValueRO.Rotation),
+          position = localToWorld.ValueRO.Position.xy,
+          rotation = PhysicsUtility.GetRotationZ(math.rotation(localToWorld.ValueRO.Value)),
           enabled = true
         };
 
@@ -159,7 +160,7 @@ namespace ECSPhysics2D
         ecb.AddComponent<PhysicsBodyInitialized>(entity);
         ecb.AddComponent(entity, new PhysicsTransformPreservation
         {
-          ZPosition = transform.ValueRO.Position.z,
+          ZPosition = localToWorld.ValueRO.Position.z,
           Scale = transform.ValueRO.Scale
         });
       }
@@ -172,15 +173,15 @@ namespace ECSPhysics2D
     private void SyncKinematicTransforms(ref SystemState state)
     {
       // Kinematic bodies: ECS drives physics transform
-      foreach (var (transform, bodyComponent) in
-          SystemAPI.Query<RefRO<LocalTransform>, RefRO<PhysicsBodyComponent>>()
+      foreach (var (localToWorld, bodyComponent) in
+          SystemAPI.Query<RefRO<LocalToWorld>, RefRO<PhysicsBodyComponent>>()
           .WithAll<PhysicsKinematicTag, PhysicsBodyInitialized>()) {
         if (!bodyComponent.ValueRO.IsValid)
           continue;
 
         var body = bodyComponent.ValueRO.Body;
-        body.position = transform.ValueRO.Position.xy;
-        body.rotation = PhysicsUtility.GetRotationZ(transform.ValueRO.Rotation);
+        body.position = localToWorld.ValueRO.Position.xy;
+        body.rotation = PhysicsUtility.GetRotationZ(math.rotation(localToWorld.ValueRO.Value));
       }
     }
 
