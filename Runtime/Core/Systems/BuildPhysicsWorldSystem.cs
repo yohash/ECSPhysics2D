@@ -71,10 +71,10 @@ namespace ECSPhysics2D
       if (_parentLookup.HasComponent(entity) &&
           _localToWorldLookup.TryGetComponent(entity, out var ltw)) {
         position = ltw.Position.xy;
-        rotation = PhysicsUtility.GetRotationZ(math.rotation(ltw.Value));
+        rotation = PhysicsUtility.GetRotationZ(new quaternion(ltw.Value)).angle;
       } else {
         position = transform.Position.xy;
-        rotation = PhysicsUtility.GetRotationZ(transform.Rotation);
+        rotation = PhysicsUtility.GetRotationZ(transform.Rotation).angle;
       }
     }
 
@@ -105,7 +105,7 @@ namespace ECSPhysics2D
         {
           type = PhysicsBody.BodyType.Dynamic,
           position = position,
-          rotation = rotation,
+          rotation = new PhysicsRotate(rotation),
           fastCollisionsAllowed = bodyComponent.ValueRO.EnableCCD,
           linearVelocity = bodyComponent.ValueRO.InitialLinearVelocity,
           angularVelocity = bodyComponent.ValueRO.InitialAngularVelocity,
@@ -152,7 +152,7 @@ namespace ECSPhysics2D
         {
           type = PhysicsBody.BodyType.Kinematic,
           position = position,
-          rotation = rotation,
+          rotation = new PhysicsRotate(rotation),
           fastCollisionsAllowed = bodyComponent.ValueRO.EnableCCD,
           enabled = true
         };
@@ -189,7 +189,7 @@ namespace ECSPhysics2D
         {
           type = PhysicsBody.BodyType.Static,
           position = position,
-          rotation = rotation,
+          rotation = new PhysicsRotate(rotation),
           enabled = true
         };
 
@@ -223,7 +223,7 @@ namespace ECSPhysics2D
 
         var body = bodyComponent.ValueRO.Body;
         body.position = position;
-        body.rotation = rotation;
+        body.rotation = new PhysicsRotate(rotation);
       }
     }
 
