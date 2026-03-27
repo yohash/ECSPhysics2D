@@ -36,7 +36,6 @@ namespace ECSPhysics2D
         var overlaps = physicsWorld.OverlapAABB(aabb, request.ValueRO.Filter);
 
         // Find closest point among all overlapping shapes
-        bool found = false;
         float closestDistSq = searchRadius * searchRadius;
         ClosestPointResult result = default;
 
@@ -64,7 +63,6 @@ namespace ECSPhysics2D
               Shape = shape,
               Entity = body.GetEntityUserData()
             };
-            found = true;
           }
         }
 
