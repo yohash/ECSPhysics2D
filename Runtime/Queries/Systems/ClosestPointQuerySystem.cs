@@ -68,6 +68,36 @@ namespace ECSPhysics2D
           }
         }
 
+        // Determine if query point is inside the closest shape to orient the normal correctly.
+        // ClosestPoint() always returns a surface point; the normal sign depends on which side we're on.
+        if (found) {
+          var pointInput = new PhysicsQuery.OverlapPointInput
+          {
+            Position = request.ValueRO.Point,
+            Filter = request.ValueRO.Filter
+          };
+          var pointHits = new NativeList<PhysicsQuery.OverlapPointHit>(4, Allocator.Temp);
+          bool isInside = false;
+
+          if (physicsWorld.OverlapPoint(pointInput, ref pointHits)) {
+            for (int j = 0; j < pointHits.Length; j++) {
+              if (pointHits[j].shape == result.Shape) {
+                isInside = true;
+                break;
+              }
+            }
+          }
+          pointHits.Dispose();
+
+          // diff = closestPoint - queryPoint
+          // Outside: outward normal = normalize(-diff)  Inside: outward normal = normalize(diff)
+          var diff = result.ClosestPoint - request.ValueRO.Point;
+          var diffLenSq = math.lengthsq(diff);
+          result.Normal = diffLenSq > 1e-10f
+            ? math.normalize(isInside ? diff : -diff)
+            : float2.zero;
+        }
+
         // Store result — always write, even when not found, so consumers
         // don't read stale data from a previous frame's query.
         if (request.ValueRO.ResultEntity != Entity.Null) {
