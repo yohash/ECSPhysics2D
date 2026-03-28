@@ -11,8 +11,8 @@ namespace ECSPhysics2D
   {
     public bool Found;
     public float2 ClosestPoint;
-    // PhysicsShape has no native normal API. Normal is computed via OverlapPoint inside/outside
-    // detection: outward from the surface toward the exterior, zero if query point is on the surface.
+    // Outward surface normal at the closest point. Derived analytically from PhysicsShape geometry
+    // (shapeType + geometry accessors). Zero when the query point lies exactly on the surface.
     public float2 Normal;
     public float Distance;
     public PhysicsBody Body;
