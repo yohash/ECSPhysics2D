@@ -93,7 +93,7 @@ namespace ECSPhysics2D
     {
       if (Mouse.current == null) return float2.zero;
 
-      var camera = Camera.main;
+      var camera = Camera.main ?? Object.FindFirstObjectByType<Camera>();
       if (camera == null) return float2.zero;
 
       var screenPos = Mouse.current.position.ReadValue();
