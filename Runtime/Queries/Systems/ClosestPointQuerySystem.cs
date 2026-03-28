@@ -144,12 +144,20 @@ namespace ECSPhysics2D
           return bestNormal;
         }
 
-        case PhysicsShape.ShapeType.Segment:
-        case PhysicsShape.ShapeType.ChainSegment: {
+        case PhysicsShape.ShapeType.Segment: {
           var geo = shape.segmentGeometry;
           var edge = TransformPoint(geo.point2, pos, angle) - TransformPoint(geo.point1, pos, angle);
           var perp = new float2(edge.y, -edge.x);
           // Segments have no interior; orient the normal toward the query point side.
+          var toQuery = queryPoint - closestPoint;
+          if (math.dot(perp, toQuery) < 0) perp = -perp;
+          return math.lengthsq(perp) > 1e-10f ? math.normalize(perp) : float2.zero;
+        }
+
+        case PhysicsShape.ShapeType.ChainSegment: {
+          var geo = shape.chainSegmentGeometry;
+          var edge = TransformPoint(geo.point2, pos, angle) - TransformPoint(geo.point1, pos, angle);
+          var perp = new float2(edge.y, -edge.x);
           var toQuery = queryPoint - closestPoint;
           if (math.dot(perp, toQuery) < 0) perp = -perp;
           return math.lengthsq(perp) > 1e-10f ? math.normalize(perp) : float2.zero;
