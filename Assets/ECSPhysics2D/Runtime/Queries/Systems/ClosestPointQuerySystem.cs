@@ -68,34 +68,8 @@ namespace ECSPhysics2D
           }
         }
 
-        // Determine if query point is inside the closest shape to orient the normal correctly.
-        // ClosestPoint() always returns a surface point; the normal sign depends on which side we're on.
         if (found) {
-          var pointInput = new PhysicsQuery.OverlapPointInput
-          {
-            Position = request.ValueRO.Point,
-            Filter = request.ValueRO.Filter
-          };
-          var pointHits = new NativeList<PhysicsQuery.OverlapPointHit>(4, Allocator.Temp);
-          bool isInside = false;
-
-          if (physicsWorld.OverlapPoint(pointInput, ref pointHits)) {
-            for (int j = 0; j < pointHits.Length; j++) {
-              if (pointHits[j].shape == result.Shape) {
-                isInside = true;
-                break;
-              }
-            }
-          }
-          pointHits.Dispose();
-
-          // diff = closestPoint - queryPoint
-          // Outside: outward normal = normalize(-diff)  Inside: outward normal = normalize(diff)
-          var diff = result.ClosestPoint - request.ValueRO.Point;
-          var diffLenSq = math.lengthsq(diff);
-          result.Normal = diffLenSq > 1e-10f
-            ? math.normalize(isInside ? diff : -diff)
-            : float2.zero;
+          result.Normal = ComputeOutwardNormal(result.Shape, result.Body, result.ClosestPoint, request.ValueRO.Point);
         }
 
         // Store result — always write, even when not found, so consumers
@@ -110,6 +84,80 @@ namespace ECSPhysics2D
 
       ecb.Playback(state.EntityManager);
       ecb.Dispose();
+    }
+
+    private static float2 TransformPoint(float2 localPoint, float2 bodyPos, float bodyAngle)
+    {
+      float cos = math.cos(bodyAngle);
+      float sin = math.sin(bodyAngle);
+      return bodyPos + new float2(
+        localPoint.x * cos - localPoint.y * sin,
+        localPoint.x * sin + localPoint.y * cos
+      );
+    }
+
+    private static float2 ComputeOutwardNormal(
+      PhysicsShape shape, PhysicsBody body, float2 closestPoint, float2 queryPoint)
+    {
+      var pos = body.position;
+      var angle = body.rotation.angle;
+
+      switch (shape.shapeType) {
+        case PhysicsShape.ShapeType.Circle: {
+          var worldCenter = TransformPoint(shape.circleGeometry.center, pos, angle);
+          var diff = closestPoint - worldCenter;
+          return math.lengthsq(diff) > 1e-10f ? math.normalize(diff) : float2.zero;
+        }
+
+        case PhysicsShape.ShapeType.Capsule: {
+          var geo = shape.capsuleGeometry;
+          var c1 = TransformPoint(geo.center1, pos, angle);
+          var c2 = TransformPoint(geo.center2, pos, angle);
+          var axis = c2 - c1;
+          var axisLenSq = math.lengthsq(axis);
+          var t = axisLenSq > 1e-10f
+            ? math.saturate(math.dot(closestPoint - c1, axis) / axisLenSq)
+            : 0.5f;
+          var diff = closestPoint - (c1 + t * axis);
+          return math.lengthsq(diff) > 1e-10f ? math.normalize(diff) : float2.zero;
+        }
+
+        case PhysicsShape.ShapeType.Polygon: {
+          var geo = shape.polygonGeometry;
+          float minDistSq = float.MaxValue;
+          float2 bestNormal = float2.zero;
+          for (int v = 0; v < geo.count; v++) {
+            var a = TransformPoint(geo.vertices[v], pos, angle);
+            var b = TransformPoint(geo.vertices[(v + 1) % geo.count], pos, angle);
+            var edge = b - a;
+            var edgeLenSq = math.lengthsq(edge);
+            var t = edgeLenSq > 1e-10f
+              ? math.saturate(math.dot(closestPoint - a, edge) / edgeLenSq)
+              : 0f;
+            var proj = a + t * edge;
+            var dSq = math.distancesq(closestPoint, proj);
+            if (dSq < minDistSq) {
+              minDistSq = dSq;
+              bestNormal = math.normalize(new float2(edge.y, -edge.x));
+            }
+          }
+          return bestNormal;
+        }
+
+        case PhysicsShape.ShapeType.Segment:
+        case PhysicsShape.ShapeType.ChainSegment: {
+          var geo = shape.segmentGeometry;
+          var edge = TransformPoint(geo.point2, pos, angle) - TransformPoint(geo.point1, pos, angle);
+          var perp = new float2(edge.y, -edge.x);
+          // Segments have no interior; orient the normal toward the query point side.
+          var toQuery = queryPoint - closestPoint;
+          if (math.dot(perp, toQuery) < 0) perp = -perp;
+          return math.lengthsq(perp) > 1e-10f ? math.normalize(perp) : float2.zero;
+        }
+
+        default:
+          return float2.zero;
+      }
     }
   }
 }
