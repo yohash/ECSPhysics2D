@@ -156,7 +156,7 @@ namespace ECSPhysics2D
 
         case PhysicsShape.ShapeType.ChainSegment: {
           var geo = shape.chainSegmentGeometry;
-          var edge = TransformPoint(geo.point2, pos, angle) - TransformPoint(geo.point1, pos, angle);
+          var edge = TransformPoint(geo.segment.point2, pos, angle) - TransformPoint(geo.segment.point1, pos, angle);
           var perp = new float2(edge.y, -edge.x);
           var toQuery = queryPoint - closestPoint;
           if (math.dot(perp, toQuery) < 0) perp = -perp;
