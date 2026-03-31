@@ -3,7 +3,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace ECSPhysics2D
+namespace ECSPhysics2D.Samples.ClosestPoint
 {
   /// <summary>
   /// Each frame:
