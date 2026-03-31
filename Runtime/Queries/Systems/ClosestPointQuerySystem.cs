@@ -44,8 +44,16 @@ namespace ECSPhysics2D
           var shape = overlaps[i].shape;
           var body = overlaps[i].shape.body;
 
-          // Get shape's closest point to query point          
+          // Get shape's closest point to query point
           var closestPoint = shape.ClosestPoint(request.ValueRO.Point);
+
+          // Workaround: Unity's ClosestPoint() returns the interior query point for
+          // polygons when the query point is inside the shape. Snap to the nearest
+          // edge surface point for consistent boundary behaviour.
+          if (shape.shapeType == PhysicsShape.ShapeType.Polygon &&
+              math.distancesq(closestPoint, request.ValueRO.Point) < 1e-10f) {
+            closestPoint = SnapPolygonToNearestEdge(shape, body, request.ValueRO.Point);
+          }
           var difference = new float2
           {
             x = closestPoint.x - request.ValueRO.Point.x,
@@ -166,6 +174,37 @@ namespace ECSPhysics2D
         default:
           return float2.zero;
       }
+    }
+
+    /// <summary>
+    /// Workaround for Unity's PolygonGeometry.ClosestPoint() returning the interior
+    /// query point when the point is inside the polygon. Projects the query point
+    /// onto every edge and returns the nearest projection in world space.
+    /// </summary>
+    private static float2 SnapPolygonToNearestEdge(
+      PhysicsShape shape, PhysicsBody body, float2 queryPoint)
+    {
+      var geo = shape.polygonGeometry;
+      var pos = body.position;
+      var angle = body.rotation.angle;
+      float minDistSq = float.MaxValue;
+      float2 nearest = queryPoint;
+      for (int v = 0; v < geo.count; v++) {
+        var a = TransformPoint(geo.vertices[v], pos, angle);
+        var b = TransformPoint(geo.vertices[(v + 1) % geo.count], pos, angle);
+        var edge = b - a;
+        var edgeLenSq = math.lengthsq(edge);
+        var t = edgeLenSq > 1e-10f
+          ? math.saturate(math.dot(queryPoint - a, edge) / edgeLenSq)
+          : 0f;
+        var proj = a + t * edge;
+        var dSq = math.distancesq(queryPoint, proj);
+        if (dSq < minDistSq) {
+          minDistSq = dSq;
+          nearest = proj;
+        }
+      }
+      return nearest;
     }
   }
 }
