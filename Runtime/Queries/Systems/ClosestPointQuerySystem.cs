@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -11,8 +12,10 @@ namespace ECSPhysics2D
   [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
   [UpdateAfter(typeof(AABBQuerySystem))]
   [UpdateBefore(typeof(PhysicsSimulationSystem))]
+  [BurstCompile]
   public partial struct ClosestPointQuerySystem : ISystem
   {
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
       if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var physicsWorldSingleton))
@@ -20,6 +23,7 @@ namespace ECSPhysics2D
 
       var physicsWorld = physicsWorldSingleton.World;
       var ecb = new EntityCommandBuffer(Allocator.TempJob);
+
 
       foreach (var (request, entity) in
           SystemAPI.Query<RefRO<ClosestPointRequest>>()
@@ -94,7 +98,8 @@ namespace ECSPhysics2D
       ecb.Dispose();
     }
 
-    private static float2 TransformPoint(float2 localPoint, float2 bodyPos, float bodyAngle)
+    [BurstCompile]
+    private float2 TransformPoint(float2 localPoint, float2 bodyPos, float bodyAngle)
     {
       float cos = math.cos(bodyAngle);
       float sin = math.sin(bodyAngle);
@@ -104,7 +109,8 @@ namespace ECSPhysics2D
       );
     }
 
-    private static float2 ComputeOutwardNormal(
+    [BurstCompile]
+    private float2 ComputeOutwardNormal(
       PhysicsShape shape, PhysicsBody body, float2 closestPoint, float2 queryPoint)
     {
       var pos = body.position;
@@ -181,7 +187,8 @@ namespace ECSPhysics2D
     /// query point when the point is inside the polygon. Projects the query point
     /// onto every edge and returns the nearest projection in world space.
     /// </summary>
-    private static float2 SnapPolygonToNearestEdge(
+    [BurstCompile]
+    private float2 SnapPolygonToNearestEdge(
       PhysicsShape shape, PhysicsBody body, float2 queryPoint)
     {
       var geo = shape.polygonGeometry;
