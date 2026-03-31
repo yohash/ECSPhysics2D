@@ -4,7 +4,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-namespace ECSPhysics2D
+namespace ECSPhysics2D.Samples.ClosestPoint
 {
   /// <summary>
   /// Creates four static physics shapes for the ClosestPoint demo:
@@ -20,7 +20,8 @@ namespace ECSPhysics2D
     private void Start()
     {
       var world = World.DefaultGameObjectInjectionWorld;
-      if (world == null) {
+      if (world == null)
+      {
         Debug.LogError("ClosestPointDemoSpawner: no ECS world found.");
         return;
       }
@@ -64,7 +65,8 @@ namespace ECSPhysics2D
     private void CreateSineChain(EntityManager em, float2 origin, float width, int segments)
     {
       var verts = new NativeArray<float2>(segments + 1, Allocator.Temp);
-      for (int i = 0; i <= segments; i++) {
+      for (int i = 0; i <= segments; i++)
+      {
         float t = i / (float)segments;
         verts[i] = new float2(
           origin.x + t * width,
