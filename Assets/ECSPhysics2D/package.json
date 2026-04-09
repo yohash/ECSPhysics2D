@@ -1,6 +1,6 @@
 {
   "name": "com.ecsphysics2d.core",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "displayName": "ECSPhysics2D",
   "description": "ECSPhysics2D is an ECS-compatible wrapper for the UnityEngine.LowLevelPhysics2D Physics engine. The physics engine is struct-based, multithreaded, high performance, and out of the box DOTS compatible.",
   "unity": "6000.3",
