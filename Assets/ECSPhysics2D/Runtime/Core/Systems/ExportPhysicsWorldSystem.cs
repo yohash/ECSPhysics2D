@@ -9,35 +9,20 @@ namespace ECSPhysics2D
   /// <summary>
   /// Exports physics simulation results back to ECS components.
   /// Runs after simulation to sync physics state TO ECS.
-  ///
+  /// 
   /// Each entity's transform is read from its assigned physics world
   /// (determined by PhysicsBodyComponent.WorldIndex).
-  ///
-  /// When a physics entity has a Parent component, the world-space position
-  /// returned by Box2D is converted to local space before writing to LocalTransform.
   /// </summary>
   [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
   [UpdateAfter(typeof(PhysicsSimulationSystem))]
   [BurstCompile]
   public partial struct ExportPhysicsWorldSystem : ISystem
   {
-    private ComponentLookup<Parent> _parentLookup;
-    private ComponentLookup<LocalToWorld> _localToWorldLookup;
-
-    public void OnCreate(ref SystemState state)
-    {
-      _parentLookup = state.GetComponentLookup<Parent>(isReadOnly: true);
-      _localToWorldLookup = state.GetComponentLookup<LocalToWorld>(isReadOnly: true);
-    }
-
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
       if (!SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out var physicsWorldSingleton))
         return;
-
-      _parentLookup.Update(ref state);
-      _localToWorldLookup.Update(ref state);
 
       // Step 1: Sync Dynamic body transforms FROM physics
       SyncDynamicTransforms(ref state);
@@ -50,30 +35,23 @@ namespace ECSPhysics2D
     private void SyncDynamicTransforms(ref SystemState state)
     {
       // Dynamic bodies: Physics drives ECS transform
-      foreach (var (transform, bodyComponent, preservation, entity) in
+      foreach (var (transform, bodyComponent, preservation) in
           SystemAPI.Query<RefRW<LocalTransform>, RefRO<PhysicsBodyComponent>, RefRO<PhysicsTransformPreservation>>()
-          .WithAll<PhysicsDynamicTag, PhysicsBodyInitialized>()
-          .WithEntityAccess()) {
+          .WithAll<PhysicsDynamicTag, PhysicsBodyInitialized>()) {
         if (!bodyComponent.ValueRO.IsValid)
           continue;
 
         var body = bodyComponent.ValueRO.Body;
 
-        // Reconstruct world-space position (physics operates in XY; Z is preserved from creation)
-        var worldPos = new float3(body.position.x, body.position.y, preservation.ValueRO.ZPosition);
-        var worldRot = quaternion.RotateZ(body.rotation.angle);
+        // Update position (preserving Z)
+        transform.ValueRW.Position = new float3(
+            body.position.x,
+            body.position.y,
+            preservation.ValueRO.ZPosition
+        );
 
-        if (_parentLookup.TryGetComponent(entity, out var parent)) {
-          // Entity has a parent: convert world-space physics result to local space
-          var parentLTW = _localToWorldLookup[parent.Value];
-          var invParent = math.inverse(parentLTW.Value);
-          transform.ValueRW.Position = math.transform(invParent, worldPos);
-          transform.ValueRW.Rotation = math.mul(math.inverse(new quaternion(parentLTW.Value)), worldRot);
-        } else {
-          // Root entity: local space == world space
-          transform.ValueRW.Position = worldPos;
-          transform.ValueRW.Rotation = worldRot;
-        }
+        // Update rotation (2D rotation around Z axis)
+        transform.ValueRW.Rotation = quaternion.RotateZ(body.rotation.angle);
 
         // Scale is preserved from original value (physics doesn't affect scale)
         transform.ValueRW.Scale = preservation.ValueRO.Scale.x;

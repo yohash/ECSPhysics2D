@@ -10,13 +10,6 @@ and this project adheres to \[Semantic Versioning](https://semver.org/spec/v2.0.
 ### Added
 
 ###### Add a computed `Normal` variable to the `ClosestPointResult`. Normal is computed by geometry in `ClosestPointQuerySystem`.
-
-## \[0.1.3] - 2026-03-18
-
-### Fixed
-
-###### Fix for proper ECS parent->child relationship recognition, and appropriate `LocalToWorld` position computation
-
 ## \[0.1.2] - 2026-03-12
 
 ### Fixed
