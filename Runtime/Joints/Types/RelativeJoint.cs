@@ -12,6 +12,11 @@ namespace ECSPhysics2D
     public float2 LocalAnchorA;
     public float2 LocalAnchorB;
 
+    // Reference angle: bodyB's rest orientation relative to bodyA (degrees).
+    // Baked into localAnchorB's rotation at joint creation; shifts the zero
+    // point for AngularVelocity targeting and angular spring behavior.
+    public float ReferenceAngleDegrees;
+
     // Velocity targets (NOT position offsets)
     public float2 LinearVelocity;
     public float AngularVelocity;
