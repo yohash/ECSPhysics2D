@@ -12,6 +12,11 @@ namespace ECSPhysics2D
     public float2 LocalAnchorA;
     public float2 LocalAnchorB;
 
+    // Reference angle: bodyB's rest orientation relative to bodyA (degrees).
+    // Baked into localAnchorB's rotation at joint creation; shifts the zero
+    // point for AngularVelocity targeting and angular spring behavior.
+    public float ReferenceAngleDegrees;
+
     // Velocity targets (NOT position offsets)
     public float2 LinearVelocity;
     public float AngularVelocity;
@@ -25,15 +30,11 @@ namespace ECSPhysics2D
     public float SpringAngularFrequency;
     public float SpringAngularDamping;
 
-    // Joint constraint tuning
-    public float TuningFrequency;
-    public float TuningDamping;
-
     // Event thresholds
     public float ForceThreshold;
     public float TorqueThreshold;
 
-    public static RelativeJoint Create(float maxForce, float maxTorque, float frequency, float damping)
+    public static RelativeJoint Create(float maxForce, float maxTorque)
     {
       return new RelativeJoint
       {
@@ -45,8 +46,6 @@ namespace ECSPhysics2D
         SpringLinearDamping = 0f,
         SpringAngularFrequency = 0f,
         SpringLinearFrequency = 0f,
-        TuningFrequency = frequency,
-        TuningDamping = damping,
         ForceThreshold = float.MaxValue,
         TorqueThreshold = float.MaxValue
       };

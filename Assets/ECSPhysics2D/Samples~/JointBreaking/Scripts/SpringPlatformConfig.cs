@@ -16,8 +16,8 @@ namespace ECSPhysics2D.Samples.JointBreaking
     public float AnchorSize;
     public float SpringFrequency;
     public float SpringDamping;
-    public float LowerAngleLimit;     // Radians
-    public float UpperAngleLimit;     // Radians
+    public float LowerAngleLimit;     // Degrees
+    public float UpperAngleLimit;     // Degrees
     public float BreakThreshold;
     public float Friction;
     public float Bounciness;

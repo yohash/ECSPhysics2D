@@ -1,5 +1,6 @@
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.LowLevelPhysics2D;
 
@@ -145,11 +146,13 @@ namespace ECSPhysics2D
           bodyA = bodyA,
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(hingeJoint.ValueRO.LocalAnchorA),
-          localAnchorB = PhysicsUtility.PhysicsTransform(hingeJoint.ValueRO.LocalAnchorB),
+          localAnchorB = PhysicsUtility.PhysicsTransform(
+              hingeJoint.ValueRO.LocalAnchorB,
+              math.radians(hingeJoint.ValueRO.ReferenceAngleDegrees)),
           springTargetAngle = hingeJoint.ValueRO.TargetAngle,
           enableLimit = hingeJoint.ValueRO.EnableLimit,
-          lowerAngleLimit = hingeJoint.ValueRO.LowerAngle,
-          upperAngleLimit = hingeJoint.ValueRO.UpperAngle,
+          lowerAngleLimit = hingeJoint.ValueRO.LowerAngleDegrees,
+          upperAngleLimit = hingeJoint.ValueRO.UpperAngleDegrees,
           enableMotor = hingeJoint.ValueRO.EnableMotor,
           motorSpeed = hingeJoint.ValueRO.MotorSpeed,
           maxMotorTorque = hingeJoint.ValueRO.MaxMotorTorque,
@@ -191,7 +194,7 @@ namespace ECSPhysics2D
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(sliderJoint.ValueRO.LocalAnchorA),
           localAnchorB = PhysicsUtility.PhysicsTransform(sliderJoint.ValueRO.LocalAnchorB),
-          springTargetTranslation = sliderJoint.ValueRO.TargetAngle,
+          springTargetTranslation = sliderJoint.ValueRO.SpringTargetTranslation,
           enableLimit = sliderJoint.ValueRO.EnableLimit,
           lowerTranslationLimit = sliderJoint.ValueRO.LowerTranslation,
           upperTranslationLimit = sliderJoint.ValueRO.UpperTranslation,
@@ -235,7 +238,9 @@ namespace ECSPhysics2D
           bodyA = bodyA,
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(wheelJoint.ValueRO.LocalAnchorA),
-          localAnchorB = PhysicsUtility.PhysicsTransform(wheelJoint.ValueRO.LocalAnchorB),
+          localAnchorB = PhysicsUtility.PhysicsTransform(
+              wheelJoint.ValueRO.LocalAnchorB,
+              math.radians(wheelJoint.ValueRO.ReferenceAngleDegrees)),
           enableSpring = wheelJoint.ValueRO.EnableSpring,
           springFrequency = wheelJoint.ValueRO.SpringHertz,
           springDamping = wheelJoint.ValueRO.SpringDampingRatio,
@@ -279,7 +284,9 @@ namespace ECSPhysics2D
           bodyA = bodyA,
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(fixedJoint.ValueRO.LocalAnchorA),
-          localAnchorB = PhysicsUtility.PhysicsTransform(fixedJoint.ValueRO.LocalAnchorB),
+          localAnchorB = PhysicsUtility.PhysicsTransform(
+              fixedJoint.ValueRO.LocalAnchorB,
+              math.radians(fixedJoint.ValueRO.ReferenceAngleDegrees)),
           tuningFrequency = fixedJoint.ValueRO.LinearHertz,
           tuningDamping = fixedJoint.ValueRO.LinearDampingRatio,
           angularFrequency = fixedJoint.ValueRO.AngularHertz,
@@ -318,7 +325,9 @@ namespace ECSPhysics2D
           bodyA = bodyA,
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(relativeJoint.ValueRO.LocalAnchorA),
-          localAnchorB = PhysicsUtility.PhysicsTransform(relativeJoint.ValueRO.LocalAnchorB),
+          localAnchorB = PhysicsUtility.PhysicsTransform(
+              relativeJoint.ValueRO.LocalAnchorB,
+              math.radians(relativeJoint.ValueRO.ReferenceAngleDegrees)),
           linearVelocity = relativeJoint.ValueRO.LinearVelocity,
           angularVelocity = relativeJoint.ValueRO.AngularVelocity,
           maxForce = relativeJoint.ValueRO.MaxForce,

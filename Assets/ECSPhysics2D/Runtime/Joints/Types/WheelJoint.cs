@@ -13,6 +13,10 @@ namespace ECSPhysics2D
     public float2 LocalAnchorB;     // Wheel center
     public float2 LocalAxisA;       // Suspension axis (usually vertical)
 
+    // Reference angle: wheel's rest orientation relative to chassis (degrees).
+    // Baked into localAnchorB's rotation at joint creation.
+    public float ReferenceAngleDegrees;
+
     // Suspension spring
     public bool EnableSpring;
     public float SpringHertz;       // Suspension frequency

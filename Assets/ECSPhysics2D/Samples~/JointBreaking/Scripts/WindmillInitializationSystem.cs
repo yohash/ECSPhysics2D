@@ -196,7 +196,7 @@ namespace ECSPhysics2D.Samples.JointBreaking
         {
           LocalAnchorA = spokeAnchorOnCircle,
           LocalAnchorB = spokeAnchorLocal,
-          ReferenceAngle = 0f,  // Maintain rigid angle
+          ReferenceAngleDegrees = 0f,  // Maintain rigid angle
           LinearHertz = 0f, // Rigid (no spring)
           LinearDampingRatio = 1f,
           AngularHertz = 0,

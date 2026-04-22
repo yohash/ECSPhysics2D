@@ -12,7 +12,10 @@ namespace ECSPhysics2D
     public float2 LocalAnchorA;     // Anchor point on body A
     public float2 LocalAnchorB;     // Anchor point on body B
     public float2 LocalAxisA;       // Sliding axis in body A space
-    public float TargetAngle;    // Maintains relative rotation
+
+    // Spring target translation (meters along the slide axis).
+    // Only active when EnableSpring is true.
+    public float SpringTargetTranslation;
 
     // Translation limits
     public bool EnableLimit;
@@ -40,7 +43,7 @@ namespace ECSPhysics2D
         LocalAnchorA = float2.zero,
         LocalAnchorB = float2.zero,
         LocalAxisA = math.normalize(axis),
-        TargetAngle = 0f,
+        SpringTargetTranslation = 0f,
         EnableLimit = true,
         LowerTranslation = minDist,
         UpperTranslation = maxDist,
@@ -58,7 +61,7 @@ namespace ECSPhysics2D
         LocalAnchorA = float2.zero,
         LocalAnchorB = float2.zero,
         LocalAxisA = math.normalize(axis),
-        TargetAngle = 0f,
+        SpringTargetTranslation = 0f,
         EnableLimit = true,
         LowerTranslation = 0f,
         UpperTranslation = stroke,
