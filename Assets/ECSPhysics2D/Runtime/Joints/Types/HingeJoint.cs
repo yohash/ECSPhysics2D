@@ -21,10 +21,11 @@ namespace ECSPhysics2D
     // Spring target angle (radians). Only active when EnableSpring is true.
     public float TargetAngle;
 
-    // Angle limits
+    // Angle limits (radians, relative to ReferenceAngleDegrees).
+    // Box2D v3 clamps to roughly ±0.99π.
     public bool EnableLimit;
-    public float LowerAngle;        // Minimum angle (degrees)
-    public float UpperAngle;        // Maximum angle (degrees)
+    public float LowerAngleRadians;
+    public float UpperAngleRadians;
 
     // Motor properties
     public bool EnableMotor;
@@ -80,8 +81,8 @@ namespace ECSPhysics2D
         LocalAnchorB = float2.zero,
         TargetAngle = 0f,
         EnableLimit = true,
-        LowerAngle = minAngle,
-        UpperAngle = maxAngle,
+        LowerAngleRadians = minAngle,
+        UpperAngleRadians = maxAngle,
         EnableMotor = false,
         EnableSpring = false,
         ForceThreshold = float.MaxValue,
