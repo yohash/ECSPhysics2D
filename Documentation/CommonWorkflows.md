@@ -247,6 +247,17 @@ Every joint entity needs:
 1. `PhysicsJointComponent` — references BodyA, BodyB, joint type
 2. Type-specific component — `HingeJoint`, `DistanceJoint`, etc.
 
+### Unit conventions
+
+The Unity `LowLevelPhysics2D` joint API uses **two different angle units** depending on the field:
+
+| Field type | Unit | Examples |
+|---|---|---|
+| Joint angle limits / targets / motor speed | **Degrees** | `lowerAngleLimit`, `upperAngleLimit`, `springTargetAngle`, `motorSpeed` on `PhysicsHingeJointDefinition` |
+| Anchor frame rotation (`PhysicsTransform.rotation`) | **Radians** | `localAnchorA.rotation`, `localAnchorB.rotation` |
+
+This is why `HingeJoint` (and other joint structs) distinguish between `LowerAngleDegrees`/`UpperAngleDegrees` (passed directly to the limit fields) and `ReferenceAngleDegrees` (converted with `math.radians()` before being baked into the `localAnchorB` frame rotation in `JointCreationSystem`). Both carry "degrees" in their names — but only `ReferenceAngleDegrees` undergoes a radians conversion, because it targets `PhysicsTransform.rotation`, not a joint angle limit field.
+
 ### Hinge (revolute)
 
 ```csharp
