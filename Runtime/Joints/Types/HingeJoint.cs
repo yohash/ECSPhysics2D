@@ -14,22 +14,23 @@ namespace ECSPhysics2D
 
     // Reference angle: bodyB's rest orientation relative to bodyA (degrees).
     // 0 = bodyB aligned with bodyA at rest. Baked into localAnchorB's rotation
-    // at joint creation, so LowerAngleRadians/UpperAngleRadians/TargetAngle
+    // at joint creation, so LowerAngleDegrees/UpperAngleDegrees/TargetAngle
     // are measured relative to this offset.
     public float ReferenceAngleDegrees;
 
-    // Spring target angle (radians). Only active when EnableSpring is true.
+    // Spring target angle (degrees). Only active when EnableSpring is true.
     public float TargetAngle;
 
-    // Angle limits (radians, relative to ReferenceAngleDegrees).
-    // Box2D v3 clamps to roughly ±0.99π.
+    // Angle limits (degrees, relative to ReferenceAngleDegrees).
+    // Unity's PhysicsHingeJointDefinition uses degrees; Box2D's internal ±0.99π
+    // clamp maps to roughly ±178°.
     public bool EnableLimit;
-    public float LowerAngleRadians;
-    public float UpperAngleRadians;
+    public float LowerAngleDegrees;
+    public float UpperAngleDegrees;
 
     // Motor properties
     public bool EnableMotor;
-    public float MotorSpeed;        // Target angular velocity (rad/s)
+    public float MotorSpeed;        // Target angular velocity (deg/s)
     public float MaxMotorTorque;    // Maximum torque
 
     // Spring properties (for flexible joints)
@@ -81,8 +82,8 @@ namespace ECSPhysics2D
         LocalAnchorB = float2.zero,
         TargetAngle = 0f,
         EnableLimit = true,
-        LowerAngleRadians = minAngle,
-        UpperAngleRadians = maxAngle,
+        LowerAngleDegrees = minAngle,
+        UpperAngleDegrees = maxAngle,
         EnableMotor = false,
         EnableSpring = false,
         ForceThreshold = float.MaxValue,
