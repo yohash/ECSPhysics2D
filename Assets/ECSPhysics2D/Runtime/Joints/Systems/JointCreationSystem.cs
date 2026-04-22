@@ -1,5 +1,6 @@
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.LowLevelPhysics2D;
 
@@ -145,7 +146,9 @@ namespace ECSPhysics2D
           bodyA = bodyA,
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(hingeJoint.ValueRO.LocalAnchorA),
-          localAnchorB = PhysicsUtility.PhysicsTransform(hingeJoint.ValueRO.LocalAnchorB),
+          localAnchorB = PhysicsUtility.PhysicsTransform(
+              hingeJoint.ValueRO.LocalAnchorB,
+              math.radians(hingeJoint.ValueRO.ReferenceAngleDegrees)),
           springTargetAngle = hingeJoint.ValueRO.TargetAngle,
           enableLimit = hingeJoint.ValueRO.EnableLimit,
           lowerAngleLimit = hingeJoint.ValueRO.LowerAngle,

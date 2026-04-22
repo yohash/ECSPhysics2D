@@ -11,7 +11,15 @@ namespace ECSPhysics2D
   {
     public float2 LocalAnchorA;     // Pivot point on body A
     public float2 LocalAnchorB;     // Pivot point on body B
-    public float TargetAngle;    // Initial angle between bodies
+
+    // Reference angle: bodyB's rest orientation relative to bodyA (degrees).
+    // 0 = bodyB aligned with bodyA at rest. Baked into localAnchorB's rotation
+    // at joint creation, so LowerAngleRadians/UpperAngleRadians/TargetAngle
+    // are measured relative to this offset.
+    public float ReferenceAngleDegrees;
+
+    // Spring target angle (radians). Only active when EnableSpring is true.
+    public float TargetAngle;
 
     // Angle limits
     public bool EnableLimit;
