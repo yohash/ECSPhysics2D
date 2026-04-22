@@ -11,7 +11,9 @@ namespace ECSPhysics2D
   {
     public float2 LocalAnchorA;
     public float2 LocalAnchorB;
-    public float ReferenceAngle;    // Fixed relative angle
+    // Fixed relative angle of bodyB to bodyA at rest (degrees).
+    // Baked into localAnchorB's rotation at joint creation.
+    public float ReferenceAngleDegrees;
 
     // Flexibility (0 = rigid, >0 = flexible)
     public float LinearHertz;       // Linear spring frequency
@@ -29,7 +31,7 @@ namespace ECSPhysics2D
       {
         LocalAnchorA = anchorA,
         LocalAnchorB = anchorB,
-        ReferenceAngle = 0f,
+        ReferenceAngleDegrees = 0f,
         LinearHertz = 0f,
         LinearDampingRatio = 0f,
         AngularHertz = 0f,
@@ -45,7 +47,7 @@ namespace ECSPhysics2D
       {
         LocalAnchorA = anchorA,
         LocalAnchorB = anchorB,
-        ReferenceAngle = 0f,
+        ReferenceAngleDegrees = 0f,
         LinearHertz = 10f * (1f - flexibility),
         LinearDampingRatio = 0.5f,
         AngularHertz = 10f * (1f - flexibility),
