@@ -194,7 +194,7 @@ namespace ECSPhysics2D
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(sliderJoint.ValueRO.LocalAnchorA),
           localAnchorB = PhysicsUtility.PhysicsTransform(sliderJoint.ValueRO.LocalAnchorB),
-          springTargetTranslation = sliderJoint.ValueRO.TargetAngle,
+          springTargetTranslation = sliderJoint.ValueRO.SpringTargetTranslation,
           enableLimit = sliderJoint.ValueRO.EnableLimit,
           lowerTranslationLimit = sliderJoint.ValueRO.LowerTranslation,
           upperTranslationLimit = sliderJoint.ValueRO.UpperTranslation,
