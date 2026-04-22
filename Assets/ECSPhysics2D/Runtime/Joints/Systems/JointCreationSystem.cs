@@ -282,7 +282,9 @@ namespace ECSPhysics2D
           bodyA = bodyA,
           bodyB = bodyB,
           localAnchorA = PhysicsUtility.PhysicsTransform(fixedJoint.ValueRO.LocalAnchorA),
-          localAnchorB = PhysicsUtility.PhysicsTransform(fixedJoint.ValueRO.LocalAnchorB),
+          localAnchorB = PhysicsUtility.PhysicsTransform(
+              fixedJoint.ValueRO.LocalAnchorB,
+              math.radians(fixedJoint.ValueRO.ReferenceAngleDegrees)),
           tuningFrequency = fixedJoint.ValueRO.LinearHertz,
           tuningDamping = fixedJoint.ValueRO.LinearDampingRatio,
           angularFrequency = fixedJoint.ValueRO.AngularHertz,
