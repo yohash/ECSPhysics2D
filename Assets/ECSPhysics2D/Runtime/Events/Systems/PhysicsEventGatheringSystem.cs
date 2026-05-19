@@ -121,6 +121,9 @@ namespace ECSPhysics2D
       for (int i = 0; i < endEvents.Length; i++) {
         var rawEvent = endEvents[i];
 
+        // shapes are invalidated when a body is destroyed mid-frame
+        if (!rawEvent.shapeA.isValid || !rawEvent.shapeB.isValid) { continue; }
+
         var evt = new CollisionEvent
         {
           EntityA = rawEvent.shapeA.body.GetEntityUserData(),
@@ -143,6 +146,9 @@ namespace ECSPhysics2D
       var hitEvents = world.contactHitEvents;
       for (int i = 0; i < hitEvents.Length; i++) {
         var rawEvent = hitEvents[i];
+
+        // shapes are invalidated when a body is destroyed mid-frame
+        if (!rawEvent.shapeA.isValid || !rawEvent.shapeB.isValid) { continue; }
 
         // Get full velocities at contact point
         float2 velA = GetVelocityAtPoint(rawEvent.shapeA.body, rawEvent.point);
@@ -235,6 +241,9 @@ namespace ECSPhysics2D
       var exitEvents = world.triggerEndEvents;
       for (int i = 0; i < exitEvents.Length; i++) {
         var rawEvent = exitEvents[i];
+
+        // shapes are invalidated when a body is destroyed mid-frame
+        if (!rawEvent.triggerShape.isValid || !rawEvent.visitorShape.isValid) { continue; }
 
         var evt = new TriggerEvent
         {
