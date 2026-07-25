@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on \[Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to \[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## \[0.1.8] - 2026-07-25
+
+### Fixed
+
+- Trigger events never fired for circle, box, capsule, polygon, or compound shapes; these paths set the Unity `isTrigger` flag but left `triggerEvents` false, producing a shape that Box2D treats as a sensor but never reports overlaps for, so `PhysicsEventsSingleton.Buffers.Triggers` stayed empty for the shape's entire lifetime (#17). Chain shapes were unaffected - `PhysicsChainDefinition` has no `isTrigger`, so that path already set `triggerEvents`
+
+### Changed
+
+- `CollisionFilter.GenerateTriggerEvents` split into two fields: `IsTrigger` (Unity's `isTrigger` - this shape is a trigger volume) and `GenerateTriggerEvents` (Unity's `triggerEvents` - this shape participates in trigger events). One flag could not express both concepts; `triggerEvents` is false by default even for triggers, and must be set on **both** the trigger volume and the visiting shape for an overlap to be reported
+- `CollisionFilterExtensions.AsTrigger()` added; sets both flags, and is the replacement for the previous `WithTriggerEvents()` behaviour when creating a trigger volume
+- `CollisionFilterExtensions.WithTriggerEvents()` narrowed to the visitor side; it now makes a solid shape detectable by triggers and no longer turns the shape into a trigger
+
 ## \[0.1.7] - 2026-05-19
 
 ### Fixed
