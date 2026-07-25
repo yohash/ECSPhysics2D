@@ -4,9 +4,9 @@
 
 The physics engine is struct-based, multithreaded, high performance, and out of the box DOTS compatible.
 
-## Get ECS-React
+## Get ECSPhysics2D
 
-### Unity Package Manager support /#upm
+### Unity Package Manager support
 
 Add to your project via the Unity Package Manager. 
 
