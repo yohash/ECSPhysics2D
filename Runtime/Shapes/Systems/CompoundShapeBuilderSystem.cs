@@ -73,7 +73,8 @@ namespace ECSPhysics2D
           bounciness = material.Bounciness
         },
         density = material.Density,
-        isTrigger = filter.GenerateTriggerEvents,
+        isTrigger = filter.IsTrigger,
+        triggerEvents = filter.GenerateTriggerEvents,
         contactEvents = filter.GenerateCollisionEvents,
         contactFilter = new PhysicsShape.ContactFilter
         {

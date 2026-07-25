@@ -35,7 +35,16 @@ namespace ECSPhysics2D
     public bool GenerateCollisionEvents;
 
     /// <summary>
-    /// If true, trigger events will be generated for this shape
+    /// If true, this shape is a trigger volume: it produces no collision response
+    /// and reports overlaps instead.
+    /// Not supported on chain shapes - Unity's PhysicsChainDefinition has no isTrigger.
+    /// </summary>
+    public bool IsTrigger;
+
+    /// <summary>
+    /// If true, this shape participates in trigger events.
+    /// Must be true on BOTH the trigger volume and the visiting shape for an overlap
+    /// to be reported. False by default, even for triggers.
     /// </summary>
     public bool GenerateTriggerEvents;
 
@@ -270,7 +279,19 @@ namespace ECSPhysics2D
     }
 
     /// <summary>
-    /// Sets the filter to generate trigger events.
+    /// Makes this shape a trigger volume and enables its trigger events.
+    /// Shapes that should be detected by it must also set WithTriggerEvents().
+    /// </summary>
+    public static CollisionFilter AsTrigger(this CollisionFilter filter, bool enable = true)
+    {
+      filter.IsTrigger = enable;
+      filter.GenerateTriggerEvents = enable;
+      return filter;
+    }
+
+    /// <summary>
+    /// Allows this shape to be detected by trigger volumes.
+    /// Does not make the shape a trigger - see AsTrigger().
     /// </summary>
     public static CollisionFilter WithTriggerEvents(this CollisionFilter filter, bool enable = true)
     {
