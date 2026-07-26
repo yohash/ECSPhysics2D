@@ -693,9 +693,34 @@ foreach (var trigger in events.Buffers.Triggers)
 Events only fire if enabled on the shape's `CollisionFilter`:
 
 ```csharp
-ecb.AddComponent(entity, CollisionFilter.Default.WithCollisionEvents());  // Collision events
-ecb.AddComponent(entity, CollisionFilter.Default.WithTriggerEvents());    // Trigger events (no physics)
+ecb.AddComponent(entity, CollisionFilter.Default.WithCollisionEvents());       // Collision events
+
+ecb.AddComponent(triggerEntity, CollisionFilter.Default.AsTrigger());          // trigger volume (no physics)
+ecb.AddComponent(visitorEntity, CollisionFilter.Default.WithTriggerEvents());  // detectable by triggers
 ```
+
+`AsTrigger()` and `WithTriggerEvents()` are two different roles:
+
+- **`AsTrigger()`** makes the shape a trigger volume - it stops producing a collision
+  response and starts reporting overlaps. It also enables its own trigger events.
+- **`WithTriggerEvents()`** leaves the shape solid and merely makes it *visible* to
+  trigger volumes.
+
+### Trigger Gotchas
+
+Three behaviours inherited from the underlying physics engine that otherwise read as bugs:
+
+- **Both shapes must opt in.** A trigger only reports a visitor if that visitor also
+  sets `WithTriggerEvents()`. Miss either side and `Buffers.Triggers` stays silent -
+  this is separate from, and in addition to, category/mask filtering, which must also
+  pass reciprocally.
+- **Triggers have no continuous collision.** An object that passes clean through a
+  trigger within a single step generates no event. For fast movers or small triggers,
+  use a ray or shape cast instead.
+- **Triggers detect other triggers.** Two `AsTrigger()` shapes will report each other.
+
+Chain shapes cannot be trigger volumes - `IsTrigger` is ignored on them. They can still
+set `WithTriggerEvents()` to be detected by other triggers.
 
 ### Joint Threshold Events
 

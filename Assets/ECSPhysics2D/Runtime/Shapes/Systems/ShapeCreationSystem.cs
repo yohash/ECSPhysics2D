@@ -60,7 +60,8 @@ namespace ECSPhysics2D
             bounciness = material.ValueRO.Bounciness
           },
           density = material.ValueRO.Density,
-          isTrigger = filter.ValueRO.GenerateTriggerEvents,
+          isTrigger = filter.ValueRO.IsTrigger,
+          triggerEvents = filter.ValueRO.GenerateTriggerEvents,
           contactEvents = filter.ValueRO.GenerateCollisionEvents,
           contactFilter = filter.ValueRO.ToContactFilter()
         };
@@ -120,7 +121,8 @@ namespace ECSPhysics2D
             bounciness = material.ValueRO.Bounciness
           },
           density = material.ValueRO.Density,
-          isTrigger = filter.ValueRO.GenerateTriggerEvents,
+          isTrigger = filter.ValueRO.IsTrigger,
+          triggerEvents = filter.ValueRO.GenerateTriggerEvents,
           contactEvents = filter.ValueRO.GenerateCollisionEvents,
           contactFilter = filter.ValueRO.ToContactFilter()
         };
@@ -173,7 +175,8 @@ namespace ECSPhysics2D
             bounciness = material.ValueRO.Bounciness
           },
           density = material.ValueRO.Density,
-          isTrigger = filter.ValueRO.GenerateTriggerEvents,
+          isTrigger = filter.ValueRO.IsTrigger,
+          triggerEvents = filter.ValueRO.GenerateTriggerEvents,
           contactEvents = filter.ValueRO.GenerateCollisionEvents,
           contactFilter = filter.ValueRO.ToContactFilter()
         };
@@ -238,7 +241,8 @@ namespace ECSPhysics2D
             bounciness = material.ValueRO.Bounciness
           },
           density = material.ValueRO.Density,
-          isTrigger = filter.ValueRO.GenerateTriggerEvents,
+          isTrigger = filter.ValueRO.IsTrigger,
+          triggerEvents = filter.ValueRO.GenerateTriggerEvents,
           contactEvents = filter.ValueRO.GenerateCollisionEvents,
           contactFilter = filter.ValueRO.ToContactFilter()
         };
