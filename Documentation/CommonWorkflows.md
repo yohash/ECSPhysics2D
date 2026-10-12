@@ -427,9 +427,19 @@ ecb.AddComponent(explosion, PhysicsExplosion.Create(
     force: 500f,
     worldIndex: 0
 ));
+
+// With a falloff band beyond the radius
+ecb.AddComponent(explosion, PhysicsExplosion.CreateWithFalloff(
+    center: impactPoint,
+    radius: 5f,
+    force: 500f,
+    falloff: 2f
+));
 ```
 
 `ExplosionSystem` calls `PhysicsWorld.Explode()` internally — handles spatial query, falloff, and impulse application in one optimized call.
+
+Every shape within `radius` receives the **same** impulse; there is no fade inside the radius. `falloff` adds a band beyond the radius over which the impulse fades linearly to zero, so the total reach is `radius + falloff`. The impulse per unit length is `force / radius`, so for the same `force`, a larger radius pushes each shape less.
 
 ### Clear All Forces
 
