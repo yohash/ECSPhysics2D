@@ -370,11 +370,12 @@ Add force/impulse components to dynamic bodies. `BatchForceApplicationSystem` pr
 
 | Component | Behavior | Use Case |
 |-----------|----------|----------|
-| `PhysicsForce` | Continuous, each frame | Thrust, wind, gravity wells |
+| `PhysicsForce` | Continuous, each frame | Thrust, per-body pushes |
 | `PhysicsImpulse` | One-shot, auto-removed | Jumps, explosions, impacts |
 | `PhysicsTorque` | Rotational force | Spinning, steering |
 | `PhysicsAngularImpulse` | One-shot rotation | Spin kicks, ricochet |
 | `PhysicsExplosion` | Radial impulse | Explosions, shockwaves |
+| `PhysicsForceField` | Area force, each fixed step | Wind, gravity wells, vortices, slow zones |
 
 ### Continuous Force
 
@@ -440,6 +441,51 @@ ecb.AddComponent(explosion, PhysicsExplosion.CreateWithFalloff(
 `ExplosionSystem` calls `PhysicsWorld.Explode()` internally — handles spatial query, falloff, and impulse application in one optimized call.
 
 Every shape within `radius` receives the **same** impulse; there is no fade inside the radius. `falloff` adds a band beyond the radius over which the impulse fades linearly to zero, so the total reach is `radius + falloff`. The impulse per unit length is `force / radius`, so for the same `force`, a larger radius pushes each shape less.
+
+### Force Fields
+
+A force field is an entity with `PhysicsForceField` and `LocalTransform`. `ForceFieldSystem` applies it to bodies every fixed step until the entity is destroyed or the component removed.
+
+```csharp
+// Gravity well: pulls bodies on the enemy layers toward the trap, fading toward the edge
+var well = ecb.CreateEntity();
+ecb.AddComponent(well, LocalTransform.FromPosition(new float3(trapPos, 0f)));
+ecb.AddComponent(well, PhysicsForceField.CreateRadial(
+    center: trapPos,
+    strength: 40f,                       // newtons at full strength; negative pushes away
+    radius: 6f,
+    affectedLayers: enemyLayers,         // PhysicsMask; omit for all layers
+    falloff: PhysicsForceField.FalloffMode.Linear
+));
+
+// Wind everywhere (unbounded), all layers
+ecb.AddComponent(windEntity, PhysicsForceField.CreateWind(direction: new float2(1f, 0f), strength: 5f));
+
+// Vortex with a spiral angle
+ecb.AddComponent(vortexEntity, PhysicsForceField.CreateVortex(
+    center: pos, strength: 30f, radius: 5f, angle: math.PI / 3f));
+```
+
+Semantics:
+
+- **Units and mass:** `Strength` is a force in newtons applied at each body's center of mass (`ApplyForceToCenter`), so lighter bodies accelerate more than heavy ones under the same field. For `Damping` fields it is instead a rate in 1/s: velocity is scaled by `exp(-Strength * dt)` each step, which never reverses it.
+- **Sign:** positive `Radial` strength pulls toward the center; negative pushes away. `Vortex` pulls inward by `Strength * cos(angle)` and spins counter-clockwise by `Strength * sin(angle)`.
+- **Position:** the field follows its entity. `Center` is overwritten every step from `LocalTransform`, so move the entity to move the field. Distance is measured to each body's live center of mass.
+- **Range:** bodies with their center of mass between `InnerRadius` and `OuterRadius` are affected. `OuterRadius = float.MaxValue` (as in `CreateWind`) makes the field unbounded.
+- **Layer filtering:** a body is affected only if its `CollisionFilter.CategoryBits` intersect `AffectedLayers` (default all layers). Only dynamic bodies are affected.
+- **Opt-in:** every matching dynamic body is affected. Set `RequireOptInTag = true` to only affect bodies tagged `AffectedByForceFields`.
+- **World:** `WorldIndex` (default 0) selects the physics world; invalid indices fall back to 0.
+- **Performance:** bounded fields use one Box2D broadphase circle query each, so many small fields stay cheap. Unbounded fields check every dynamic body.
+
+Falloff modes (`Falloff`, bounded fields only; unbounded fields ignore it):
+
+| Mode | Strength at distance `d` from center |
+|------|--------------------------------------|
+| `None` (default) | `Strength` everywhere in range |
+| `Linear` | `Strength` at `InnerRadius`, fading linearly to 0 at `OuterRadius` |
+| `InverseSquare` | `Strength` within `r0 = max(InnerRadius, MinDistance)`, then `Strength * (r0 / d)²` |
+
+`InverseSquare` has a hard edge: at `OuterRadius` the force drops from `Strength * (r0 / OuterRadius)²` to zero. Make `OuterRadius` much larger than `r0` to keep that step small, or use `Linear` for a smooth edge. `MinDistance` defaults to 1 (also when left at 0 on a hand-built struct); set it to change `r0`.
 
 ### Clear All Forces
 

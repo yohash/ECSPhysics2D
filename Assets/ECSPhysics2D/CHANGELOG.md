@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on \[Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to \[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## \[0.3.0] - 2026-10-12
+
+### Added
+
+- `PhysicsForceField.Falloff` (`FalloffMode.None`, `Linear`, `InverseSquare`) with `MinDistance`. `None` is the default and matches previous output. `Linear` fades from full strength at `InnerRadius` to zero at `OuterRadius`. `InverseSquare` is full strength within `max(InnerRadius, MinDistance)` and falls off as `1/d²` beyond, with a hard edge at `OuterRadius`; a `MinDistance` of zero or less uses `DefaultMinDistance` (1), so a default-initialized field matches the factories and can never divide by zero. Falloff is ignored by unbounded fields (#21)
+- `PhysicsForceField.WorldIndex`: the physics world a field acts on; invalid indices fall back to world 0, matching `PhysicsExplosion` (#21)
+- `PhysicsForceField.RequireOptInTag`: when true, only bodies tagged `AffectedByForceFields` are affected (the previous behavior) (#21)
+- `CreateRadial` and `CreateVortex` take an optional `FalloffMode`, and new overloads take a `PhysicsMask affectedLayers`; `CreateWind` gains a `PhysicsMask` overload. Existing calls keep their meaning (#21)
+
+### Changed
+
+- **Behavior change:** force fields no longer require `AffectedByForceFields`. Every dynamic body on a layer in `AffectedLayers` is affected by default; set `RequireOptInTag` to restore opt-in (#21)
+- Bounded fields (finite `OuterRadius`) find bodies with one Box2D broadphase circle query per field instead of scanning every body. A multi-shape body receives a field's force once per step. Box2D's overlap query, not the entity list, now decides candidates, so: a body whose only shapes are triggers may not be returned, a shape whose collision mask is 0 is never returned, and a body with `CategoryBits == 0` is never affected (#21)
+- Distance to a field is measured from the body's live world center of mass instead of its `LocalTransform` (#21)
+- `Damping` fields scale velocity by `exp(-Strength * dt)` instead of `1 - Strength * dt`. Slightly weaker for small `Strength * dt`, but independent of step length and never negative (#21)
+
+### Fixed
+
+- `PhysicsForceField.AffectedLayers` was never read; fields affected every layer. It is now honored for every field type, including `Damping` (#21)
+- Forces with squared magnitude under 0.001 (about 0.0316 N) were silently dropped; any non-zero force is now applied (#21)
+- A `Damping` field with `Strength * dt > 1` reversed body velocity (#21)
+- Fields applied to bodies in every physics world; they now act only on `WorldIndex` (#21)
+
 ## \[0.2.0] - 2026-10-12
 
 ### Changed
