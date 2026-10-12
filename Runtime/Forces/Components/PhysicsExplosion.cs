@@ -5,15 +5,19 @@ using UnityEngine.LowLevelPhysics2D;
 namespace ECSPhysics2D
 {
   /// <summary>
-  /// Radial explosion force with distance falloff.
-  /// Triggers the native Box2D Explode() method for optimal performance.
+  /// One-shot radial explosion impulse, applied via the native Box2D Explode() method.
+  /// Every shape within Radius receives the same impulse magnitude (impulse per unit length
+  /// = Force / Radius, scaled by the shape's projected perimeter); there is no distance falloff
+  /// inside the radius. With Falloff > 0, the impulse fades linearly to zero over a band
+  /// extending Falloff beyond the radius, so the total reach is Radius + Falloff.
+  /// Note that for a fixed Force, a larger Radius gives each shape a weaker impulse.
   /// </summary>
   public struct PhysicsExplosion : IComponentData
   {
     public float2 Center;              // World position of explosion center
-    public float Radius;               // Maximum effect radius
-    public float Force;                // Force from center to radius
-    public float Falloff;              // Force linear falloff distance beyond radius
+    public float Radius;               // Full-strength radius (total reach is Radius + Falloff)
+    public float Force;                // Impulse strength; impulse per unit length = Force / Radius
+    public float Falloff;              // Impulse linear falloff distance beyond radius
     public PhysicsMask AffectedLayers; // Which collision layers are affected
     public int WorldIndex;             // Which physics world to apply explosion in (default 0)
 
