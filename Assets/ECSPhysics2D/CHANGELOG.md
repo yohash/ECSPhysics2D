@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on \[Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to \[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## \[0.2.0] - 2026-10-12
+
+### Changed
+
+- **Breaking:** removed `PhysicsExplosion.Create(center, radius, falloff, force, worldIndex)`. It took `force` and `falloff` in the opposite order from the other `Create` overloads, and since both are `float`, positional calls compiled and silently swapped the values (#19). Use `PhysicsExplosion.CreateWithFalloff(center, radius, force, falloff, worldIndex)` instead; its distinct name means old positional calls fail to compile rather than silently reordering. Callers that used named arguments only need to rename the method
+
+### Fixed
+
+- `ForceUtility.CalculateExplosionImpulse` ignored its `falloff` argument (an early return at `distance >= radius` made the falloff branch unreachable) and faded the impulse linearly inside the radius. It now matches Box2D's `Explode()` profile: full magnitude within the radius, fading linearly to zero over `falloff` beyond it
+- `PhysicsExplosion` documentation described a distance falloff inside the radius and called `Force` a force; Box2D applies a uniform impulse within `Radius` (impulse per unit length = `Force / Radius`), and `Falloff` only fades it over a band beyond the radius
+
 ## \[0.1.8] - 2026-07-25
 
 ### Fixed
