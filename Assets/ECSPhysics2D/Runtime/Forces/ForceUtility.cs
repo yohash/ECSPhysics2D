@@ -26,7 +26,9 @@ namespace ECSPhysics2D
     }
 
     /// <summary>
-    /// Calculate explosion impulse with falloff.
+    /// Calculate explosion impulse for a point, using the same distance profile as Box2D's Explode():
+    /// full magnitude within explosionRadius, fading linearly to zero over falloff beyond it.
+    /// This is a point approximation; Box2D additionally scales by each shape's projected perimeter.
     /// </summary>
     public static float2 CalculateExplosionImpulse(float2 bodyPosition, float2 explosionCenter,
         float explosionForce, float explosionRadius, float falloff)
@@ -34,7 +36,7 @@ namespace ECSPhysics2D
       var delta = bodyPosition - explosionCenter;
       var distance = math.length(delta);
 
-      if (distance >= explosionRadius || distance < 0.001f)
+      if (distance > explosionRadius + falloff || distance < 0.001f)
         return float2.zero;
 
       var direction = delta / distance;
@@ -43,8 +45,6 @@ namespace ECSPhysics2D
       // scale for linear falloff beyond radius in the "falloff" distance
       if (falloff > 0f && distance > explosionRadius) {
         forceMagnitude *= math.max(0f, 1f - (distance - explosionRadius) / falloff);
-      } else {
-        forceMagnitude *= (1f - distance / explosionRadius);
       }
 
       return direction * forceMagnitude;
