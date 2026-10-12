@@ -48,13 +48,13 @@ namespace ECSPhysics2D
     }
 
     /// <summary>
-    /// MinDistance the factories use, in world units. Only affects InverseSquare falloff.
+    /// MinDistance used when the field's MinDistance is zero or negative (e.g. a
+    /// default-initialized struct), in world units. Only affects InverseSquare falloff.
     /// </summary>
     public const float DefaultMinDistance = 1f;
 
     /// <summary>
-    /// Lower bound on the InverseSquare reference distance, so a MinDistance of zero
-    /// can never divide by zero.
+    /// Lower bound on a positive MinDistance, so a tiny value cannot blow up the falloff.
     /// </summary>
     public const float MinDistanceEpsilon = 1e-3f;
 
@@ -71,7 +71,10 @@ namespace ECSPhysics2D
     /// </summary>
     public PhysicsMask AffectedLayers;
     public FalloffMode Falloff;
-    /// <summary>InverseSquare clamp distance; values below MinDistanceEpsilon are raised to it.</summary>
+    /// <summary>
+    /// InverseSquare clamp distance. Zero or negative uses DefaultMinDistance; positive values
+    /// below MinDistanceEpsilon are raised to it.
+    /// </summary>
     public float MinDistance;
     /// <summary>Physics world this field acts on. Invalid indices fall back to world 0.</summary>
     public int WorldIndex;
@@ -110,7 +113,7 @@ namespace ECSPhysics2D
           }
 
         case FalloffMode.InverseSquare: {
-            var minDistance = math.max(MinDistance, MinDistanceEpsilon);
+            var minDistance = MinDistance > 0f ? math.max(MinDistance, MinDistanceEpsilon) : DefaultMinDistance;
             var r0 = math.max(InnerRadius, minDistance);
             var ratio = r0 / math.max(distance, minDistance);
             return math.saturate(ratio * ratio);
@@ -245,6 +248,8 @@ namespace ECSPhysics2D
     /// (strength * cos angle) combined with tangential spin (strength * sin angle).
     /// Prefer named arguments, e.g.
     /// <c>CreateVortex(center, strength: 30f, radius: 6f, affectedLayers: mask)</c>.
+    /// A positional uint mask (<c>CreateVortex(center, strength, radius, uintMask)</c>) is
+    /// ambiguous with the angle overload; pass <c>affectedLayers:</c> or cast to PhysicsMask.
     /// </summary>
     public static PhysicsForceField CreateVortex(float2 center, float strength, float radius,
         PhysicsMask affectedLayers, float angle = math.PI / 4f, FalloffMode falloff = FalloffMode.None)

@@ -9,7 +9,7 @@ and this project adheres to \[Semantic Versioning](https://semver.org/spec/v2.0.
 
 ### Added
 
-- `PhysicsForceField.Falloff` (`FalloffMode.None`, `Linear`, `InverseSquare`) with `MinDistance`. `None` is the default and matches previous output. `Linear` fades from full strength at `InnerRadius` to zero at `OuterRadius`. `InverseSquare` is full strength within `max(InnerRadius, MinDistance)` and falls off as `1/d²` beyond, with a hard edge at `OuterRadius`; `MinDistance` is clamped to a small epsilon so it can never divide by zero. Falloff is ignored by unbounded fields (#21)
+- `PhysicsForceField.Falloff` (`FalloffMode.None`, `Linear`, `InverseSquare`) with `MinDistance`. `None` is the default and matches previous output. `Linear` fades from full strength at `InnerRadius` to zero at `OuterRadius`. `InverseSquare` is full strength within `max(InnerRadius, MinDistance)` and falls off as `1/d²` beyond, with a hard edge at `OuterRadius`; a `MinDistance` of zero or less uses `DefaultMinDistance` (1), so a default-initialized field matches the factories and can never divide by zero. Falloff is ignored by unbounded fields (#21)
 - `PhysicsForceField.WorldIndex`: the physics world a field acts on; invalid indices fall back to world 0, matching `PhysicsExplosion` (#21)
 - `PhysicsForceField.RequireOptInTag`: when true, only bodies tagged `AffectedByForceFields` are affected (the previous behavior) (#21)
 - `CreateRadial` and `CreateVortex` take an optional `FalloffMode`, and new overloads take a `PhysicsMask affectedLayers`; `CreateWind` gains a `PhysicsMask` overload. Existing calls keep their meaning (#21)
