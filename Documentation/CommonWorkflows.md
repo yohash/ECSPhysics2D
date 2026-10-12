@@ -485,7 +485,7 @@ Falloff modes (`Falloff`, bounded fields only; unbounded fields ignore it):
 | `Linear` | `Strength` at `InnerRadius`, fading linearly to 0 at `OuterRadius` |
 | `InverseSquare` | `Strength` within `r0 = max(InnerRadius, MinDistance)`, then `Strength * (r0 / d)²` |
 
-`InverseSquare` has a hard edge: at `OuterRadius` the force drops from `Strength * (r0 / OuterRadius)²` to zero. Make `OuterRadius` much larger than `r0` to keep that step small, or use `Linear` for a smooth edge. The factories set `MinDistance` to 1; set it on the struct to change `r0`.
+`InverseSquare` has a hard edge: at `OuterRadius` the force drops from `Strength * (r0 / OuterRadius)²` to zero. Make `OuterRadius` much larger than `r0` to keep that step small, or use `Linear` for a smooth edge. `MinDistance` defaults to 1 (also when left at 0 on a hand-built struct); set it to change `r0`.
 
 ### Clear All Forces
 
